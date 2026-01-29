@@ -20,7 +20,9 @@ ap-base/
 ├── ap-move-lights/      # Light frame organization
 ├── legacy/
 │   └── brave-new-world/ # Legacy codebase for reference
-└── CLAUDE.md            # This file
+├── pending/             # Pending changes for each submodule
+├── CLAUDE.md            # This file (workflow instructions)
+└── .gitmodules          # Submodule configuration
 ```
 
 ## Upstream
@@ -37,9 +39,33 @@ Claude Code sessions are scoped to a single repository for git push access. When
 
 ### Recommended Workflow
 
-1. **Analysis session (ap-base)**: Analyze consistency issues across submodules, create GitHub issues with specific changes needed
+1. **Analysis session (ap-base)**: Analyze consistency issues across submodules, document needed changes in `pending/<submodule>.md`
 
-2. **Execution session (target repo)**: Open a new session pointed at the specific submodule repo, reference the GitHub issue, implement and push changes
+2. **Execution session (target repo)**: Open a new session pointed at the specific submodule repo, reference the pending file from ap-base, implement and push changes
+
+3. **Cleanup**: After changes are merged, update or remove the corresponding pending file
+
+### Pending Directory Structure
+
+The `pending/` directory contains one markdown file per submodule with documented changes needed:
+
+```
+pending/
+├── ap-common.md
+├── ap-cull-lights.md
+├── ap-fits-headers.md
+├── ap-master-calibration.md
+├── ap-move-calibration.md
+└── ap-move-lights.md
+```
+
+Each file contains:
+- Issues/changes needed for that submodule
+- Current state vs desired state
+- Rationale for changes
+- Priority/status of each item
+
+When working in a submodule session, read the corresponding `pending/<submodule>.md` file from ap-base for context on what needs to be done.
 
 ### Creating Cross-Repo Issues
 
@@ -49,48 +75,51 @@ When a session has `gh` CLI access, create issues programmatically:
 gh issue create --repo thelenorith/ap-common --title "Issue title" --body "Issue body"
 ```
 
-If `gh` is not available, document the needed changes in `pending-issues/` directory (see below).
-
-## Pending Issues
-
-When issues cannot be created directly, document them here for manual creation or future sessions.
-
-### ap-common: Standardize Makefile to use target dependencies
-
-**Status**: Pending
-
-**Summary**: The Makefile in ap-common uses inline pip install commands, while all other ap-* projects use proper Makefile target dependencies.
-
-**Current State**:
-```makefile
-format:
-	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-	$(PYTHON) -m black ap_common tests
-```
-
-**Desired State**:
-```makefile
-format: install-dev
-	$(PYTHON) -m black ap_common tests
-```
-
-**Targets to update**: `format`, `lint`, `test`, `test-verbose`, `test-coverage`, `coverage`
-
-**Also update comment** from:
-```
-# Testing (try to install deps, but continue if it fails - dependencies may already be installed)
-```
-to:
-```
-# Testing (install deps first, then run tests)
-```
-
-**Why**:
-- More idiomatic Makefile pattern
-- Cross-platform (removes Windows-style `>nul` redirect)
-- Consistent with all other ap-* projects
-
 ## Consistency Standards
+
+### Required Files
+
+All ap-* Python projects should have:
+
+| File | Purpose |
+|------|---------|
+| `LICENSE` | Apache-2.0 license file |
+| `README.md` | Project documentation with badges |
+| `MANIFEST.in` | Package manifest for sdist |
+| `Makefile` | Standard build/test targets |
+| `pyproject.toml` | Project configuration |
+| `.github/workflows/` | CI workflows (test, lint, format, coverage) |
+
+### pyproject.toml Structure
+
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ap-<name>"
+version = "0.1.0"
+description = "..."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Naveen Malik"}
+]
+keywords = ["astrophotography", ...]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+```
 
 ### Makefile Structure
 
@@ -137,6 +166,27 @@ test-coverage: install-dev
 
 coverage: install-dev
 	$(PYTHON) -m pytest --cov=<package_name> --cov-report=term
+```
+
+### README Structure
+
+READMEs should include:
+1. Title with project name
+2. Status badges (Test, Coverage, Lint, Format, Python version, code style)
+3. Brief description
+4. Overview section
+5. Installation section (dev install, pip install from git)
+6. Usage section with examples
+7. Uninstallation section
+
+Badge format:
+```markdown
+[![Test](https://github.com/jewzaam/<repo>/workflows/Test/badge.svg)](https://github.com/jewzaam/<repo>/actions/workflows/test.yml)
+[![Coverage](https://github.com/jewzaam/<repo>/workflows/Coverage%20Check/badge.svg)](https://github.com/jewzaam/<repo>/actions/workflows/coverage.yml)
+[![Lint](https://github.com/jewzaam/<repo>/workflows/Lint/badge.svg)](https://github.com/jewzaam/<repo>/actions/workflows/lint.yml)
+[![Format](https://github.com/jewzaam/<repo>/workflows/Format%20Check/badge.svg)](https://github.com/jewzaam/<repo>/actions/workflows/format.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ```
 
 ## Working with Submodules
