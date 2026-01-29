@@ -1,0 +1,136 @@
+# ap-move-calibration
+
+Organize master calibration frames into a structured library.
+
+## Overview
+
+`ap-move-calibration` copies master calibration frames from a source directory (e.g., PixInsight output) to an organized library structure based on FITS/XISF header metadata.
+
+## Installation
+
+```bash
+pip install git+https://github.com/jewzaam/ap-move-calibration.git
+```
+
+## Usage
+
+```bash
+python -m ap_move_calibration <source_dir> <dest_dir> [options]
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `source_dir` | Directory containing master frames |
+| `dest_dir` | Destination library directory |
+| `--debug` | Enable debug output |
+| `--dryrun` | Preview without copying |
+| `--no-overwrite` | Fail if destination exists |
+
+## Output Structure
+
+```
+{dest_dir}/
+├── BIAS/
+│   └── {camera}/
+│       └── masterBias_GAIN_{gain}_OFFSET_{offset}_TEMP_{temp}.xisf
+│
+├── DARK/
+│   └── {camera}/
+│       └── masterDark_EXPTIME_{exp}_GAIN_{gain}_OFFSET_{offset}_TEMP_{temp}.xisf
+│
+└── FLAT/
+    └── {camera}/
+        └── {optic}/           # Only if optic in header
+            └── DATE_{YYYY-MM-DD}/
+                └── masterFlat_FILTER_{filter}_GAIN_{gain}_OFFSET_{offset}.xisf
+```
+
+## Organization Logic
+
+```mermaid
+flowchart TB
+    FILE[Master Frame] --> READ[Read Headers]
+    READ --> TYPE{Frame Type?}
+
+    TYPE -->|BIAS| BIAS_PATH["BIAS/{camera}/"]
+    TYPE -->|DARK| DARK_PATH["DARK/{camera}/"]
+    TYPE -->|FLAT| FLAT_PATH["FLAT/{camera}/{optic}/DATE_{date}/"]
+
+    BIAS_PATH --> COPY[Copy with Metadata Filename]
+    DARK_PATH --> COPY
+    FLAT_PATH --> COPY
+```
+
+### Frame Type Detection
+
+Identifies master frame type from `IMAGETYP` header:
+- `MASTER BIAS` → BIAS directory
+- `MASTER DARK` → DARK directory
+- `MASTER FLAT` → FLAT directory
+
+### Metadata Extraction
+
+| Frame Type | Directory Keys | Filename Keys |
+|------------|----------------|---------------|
+| BIAS | Camera | Gain, Offset, Temp, Readout |
+| DARK | Camera | Exposure, Gain, Offset, Temp, Readout |
+| FLAT | Camera, Optic, Date | Filter, Gain, Offset, Temp, Focal Length |
+
+## Examples
+
+### Basic Usage
+
+```bash
+python -m ap_move_calibration /pixinsight/output/master /calibration/library
+```
+
+### Preview Changes
+
+```bash
+python -m ap_move_calibration /output /library --dryrun
+```
+
+### Fail on Existing Files
+
+```bash
+python -m ap_move_calibration /output /library --no-overwrite
+```
+
+### Debug Output
+
+```bash
+python -m ap_move_calibration /output /library --debug
+```
+
+## Workflow Integration
+
+This tool is typically used after master generation:
+
+```bash
+# 1. Generate masters with PixInsight
+python -m ap_master_calibration /raw_calibration /output \
+    --pixinsight-binary "/path/to/PixInsight"
+
+# 2. Organize into library
+python -m ap_move_calibration /output/master /calibration/library
+```
+
+## Library Benefits
+
+The organized structure allows:
+- Quick lookup by camera and optical configuration
+- Easy identification of calibration frame age (date directories)
+- Deduplication of identical frames
+- Efficient storage across sessions
+
+## Default Behavior
+
+- **Overwrites** existing files (use `--no-overwrite` to prevent)
+- Reports files copied and any errors
+- Preserves original files (copy, not move)
+
+## Repository
+
+[github.com/jewzaam/ap-move-calibration](https://github.com/jewzaam/ap-move-calibration)
