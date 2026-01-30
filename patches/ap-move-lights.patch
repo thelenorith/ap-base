@@ -1,10 +1,10 @@
 diff --git a/README.md b/README.md
-index 9da4277..a18b032 100644
+index c86dc5b..40d4121 100644
 --- a/README.md
 +++ b/README.md
-@@ -13,6 +13,14 @@ This tool evaluates light frames against HFR and RMS thresholds and moves reject
- - **Auto-Accept Threshold**: Automatically accept rejections below a configurable percentage
- - **Dry Run Mode**: Test rules without actually moving files
+@@ -6,6 +6,14 @@ A simple tool for moving and organizing astrophotography files from a raw direct
+ 
+ This tool moves and organizes LIGHT files from a raw directory to a destination directory, organizing them based on FITS header metadata into a multi-stage workflow.
  
 +## Documentation
 +
@@ -12,8 +12,8 @@ index 9da4277..a18b032 100644
 +
 +- **[Pipeline Overview](https://github.com/jewzaam/ap-base/blob/main/docs/index.md)** - Full pipeline documentation
 +- **[Workflow Guide](https://github.com/jewzaam/ap-base/blob/main/docs/workflow.md)** - Detailed workflow with diagrams
-+- **[ap-cull-lights Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-cull-lights.md)** - Detailed reference for this tool
++- **[ap-move-lights Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-move-lights.md)** - Detailed reference for this tool
 +
  ## Usage
  
- ### Basic Culling
+ ```powershell

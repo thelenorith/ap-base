@@ -1,10 +1,10 @@
 diff --git a/README.md b/README.md
-index 9da4277..a18b032 100644
+index cfa70a6..8731334 100644
 --- a/README.md
 +++ b/README.md
-@@ -13,6 +13,14 @@ This tool evaluates light frames against HFR and RMS thresholds and moves reject
- - **Auto-Accept Threshold**: Automatically accept rejections below a configurable percentage
- - **Dry Run Mode**: Test rules without actually moving files
+@@ -9,6 +9,14 @@ Automated generation of master bias, dark, and flat calibration frames for PixIn
+ - Calibrates flats with bias/dark masters using ImageCalibration with dark optimization
+ - Runs completely hands-off from the command line
  
 +## Documentation
 +
@@ -12,8 +12,8 @@ index 9da4277..a18b032 100644
 +
 +- **[Pipeline Overview](https://github.com/jewzaam/ap-base/blob/main/docs/index.md)** - Full pipeline documentation
 +- **[Workflow Guide](https://github.com/jewzaam/ap-base/blob/main/docs/workflow.md)** - Detailed workflow with diagrams
-+- **[ap-cull-lights Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-cull-lights.md)** - Detailed reference for this tool
++- **[ap-master-calibration Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-master-calibration.md)** - Detailed reference for this tool
 +
- ## Usage
+ ## Installation
  
- ### Basic Culling
+ ```bash

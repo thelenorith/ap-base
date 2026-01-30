@@ -1,41 +1,19 @@
-diff --git a/Makefile b/Makefile
-index 091e2bb..30df373 100644
---- a/Makefile
-+++ b/Makefile
-@@ -29,29 +29,23 @@ clean:
- 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
+diff --git a/README.md b/README.md
+index d2a01ba..451146a 100644
+--- a/README.md
++++ b/README.md
+@@ -19,6 +19,14 @@ This package extracts reusable functionality from astrophotography tools into a
+ - **File Operations**: Move, copy, and manage files with directory creation
+ - **Utility Functions**: Environment variable replacement, string conversion, file finding
  
- # Format code with black
--format:
--	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-+format: install-dev
- 	$(PYTHON) -m black ap_common tests
++## Documentation
++
++This tool is part of the astrophotography pipeline. For comprehensive documentation including workflow guides and integration with other tools, see:
++
++- **[Pipeline Overview](https://github.com/jewzaam/ap-base/blob/main/docs/index.md)** - Full pipeline documentation
++- **[Workflow Guide](https://github.com/jewzaam/ap-base/blob/main/docs/workflow.md)** - Detailed workflow with diagrams
++- **[ap-common Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-common.md)** - API reference for this tool
++
+ ## Installation
  
- # Lint code with flake8 (disable multiprocessing to avoid sandbox issues, match black line length)
--lint:
--	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-+lint: install-dev
- 	$(PYTHON) -m flake8 --jobs=1 --max-line-length=88 --extend-ignore=E203,E266,E501,W503,F401,W605,E722 ap_common tests
- 
--# Testing (try to install deps, but continue if it fails - dependencies may already be installed)
--test:
--	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-+# Testing (install deps first, then run tests)
-+test: install-dev
- 	$(PYTHON) -m pytest
- 
--test-verbose:
--	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-+test-verbose: install-dev
- 	$(PYTHON) -m pytest -v
- 
--test-coverage:
--	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-+test-coverage: install-dev
- 	$(PYTHON) -m pytest --cov=ap_common --cov-report=html --cov-report=term
- 
- # Coverage report (terminal output only)
--coverage:
--	-$(PYTHON) -m pip install -e ".[dev]" >nul 2>&1 || true
-+coverage: install-dev
- 	$(PYTHON) -m pytest --cov=ap_common --cov-report=term
+ ### Local Development (Editable Install)
