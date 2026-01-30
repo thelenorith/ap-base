@@ -1,191 +1,282 @@
 # Suggested Project Renames
 
-## Overview
+## Naming Taxonomy
 
-This document analyzes naming conventions for the astrophotography pipeline tools and proposes renames that better reflect data flow using consistent noun/verb patterns.
+### Nouns (singular, consistent)
 
-## Naming Philosophy
+| Noun | Definition |
+|------|------------|
+| **light** | A light frame (science image of a target) |
+| **master** | An integrated calibration frame (bias, dark, or flat) |
+| **header** | Metadata stored in the file |
 
-### Current Pattern
-The current naming uses generic verbs like "move" without clearly indicating the source/destination:
-- `ap-move-lights` - Move lights... where?
-- `ap-move-calibration` - Move calibration... from/to what?
+### Destinations
 
-### Proposed Pattern
-Use the pattern: `ap-{qualifier}-{noun}-to-{destination}` or `ap-{verb}-{noun}`
+| Destination | Directory | Purpose |
+|-------------|-----------|---------|
+| **blink** | `10_Blink/` | Initial QC stage, visual review |
+| **data** | `20_Data/` | Accepted frames, collecting more |
+| **library** | `Calibration/Library/` | Organized master frame storage |
 
-Key terms:
-- **raw** - Unprocessed frames from capture
-- **master** - Integrated/stacked calibration frames
-- **library** - Organized calibration frame storage
-- **blink** - The 10_Blink QC stage where lights are reviewed
+### Qualifiers
 
-## Data Flow Diagram
+| Qualifier | Meaning |
+|-----------|---------|
+| **raw** | Unprocessed, directly from capture |
 
-```
-                                    ┌─────────────────────────────────────────┐
-                                    │           CALIBRATION PATH              │
-                                    │                                         │
-    ┌──────────────┐                │    ┌──────────────┐    ┌────────────┐  │
-    │  Raw Bias/   │────────────────┼───►│ ap-master-   │───►│  Masters   │  │
-    │  Dark/Flat   │                │    │ calibration  │    │  (output)  │  │
-    └──────────────┘                │    └──────────────┘    └─────┬──────┘  │
-                                    │                              │         │
-                                    │                              ▼         │
-                                    │                     ┌────────────────┐ │
-                                    │                     │ ap-master-to-  │ │
-                                    │                     │ library        │ │
-                                    │                     └───────┬────────┘ │
-                                    │                             │          │
-                                    │                             ▼          │
-                                    │                     ┌────────────────┐ │
-                                    │                     │  Calibration   │ │
-                                    │                     │    Library     │ │
-                                    │                     └───────┬────────┘ │
-                                    │                             │          │
-                                    └─────────────────────────────┼──────────┘
-                                                                  │
-    ┌─────────────────────────────────────────────────────────────┼──────────┐
-    │                         LIGHT PATH                          │          │
-    │                                                             │          │
-    │   ┌──────────────┐    ┌─────────────────┐    ┌─────────────▼────────┐ │
-    │   │  Raw Lights  │───►│ ap-raw-lights-  │───►│      10_Blink        │ │
-    │   │  (capture)   │    │ to-blink        │    │                      │ │
-    │   └──────────────┘    └─────────────────┘    │  ┌────────────────┐  │ │
-    │                                              │  │ ap-master-to-  │  │ │
-    │   ┌──────────────┐    ┌─────────────────┐   │  │ blink          │◄─┼─┘
-    │   │   Reject     │◄───│  ap-cull-lights │◄──┤  └────────────────┘  │
-    │   │  Directory   │    └─────────────────┘   │                      │
-    │   └──────────────┘                          │  ap-fits-headers     │
-    │                                              │  (metadata)         │
-    │                                              └──────────┬──────────┘
-    │                                                         │
-    │                                                         ▼
-    │                                              ┌──────────────────────┐
-    │                                              │  20_Data → 60_Done   │
-    │                                              │  (manual workflow)   │
-    │                                              └──────────────────────┘
-    └─────────────────────────────────────────────────────────────────────────┘
+### Verbs
+
+| Verb | Action |
+|------|--------|
+| **cull** | Filter/reject based on quality metrics |
+| **calibrate** | Apply calibration frames to lights |
+| **preserve** | Save metadata (e.g., path → header) |
+| **create** | Generate (masters from raw frames) |
+
+## Data Flow
+
+```mermaid
+flowchart TB
+    subgraph Capture["Capture (NINA)"]
+        RAW_LIGHT[Raw Light]
+        RAW_CAL[Raw Calibration<br/>bias / dark / flat]
+    end
+
+    subgraph Pipeline["Processing Pipeline"]
+        subgraph LightPath["Light Path"]
+            TO_BLINK[ap-raw-light-to-blink]
+            CULL[ap-cull-light]
+            PRESERVE[ap-preserve-header]
+            CALIBRATE[ap-calibrate-light]
+        end
+
+        subgraph MasterPath["Master Path"]
+            CREATE[ap-create-master]
+            TO_LIB[ap-master-to-library]
+        end
+    end
+
+    subgraph Storage["Storage"]
+        BLINK[10_Blink]
+        DATA[20_Data]
+        LIBRARY[(Calibration<br/>Library)]
+        REJECT[Reject]
+    end
+
+    RAW_LIGHT --> TO_BLINK --> BLINK
+    BLINK --> CULL --> REJECT
+    CULL --> PRESERVE
+    PRESERVE --> CALIBRATE --> DATA
+
+    RAW_CAL --> CREATE --> TO_LIB --> LIBRARY
+    LIBRARY --> |ap-master-to-blink| BLINK
+    LIBRARY --> CALIBRATE
 ```
 
 ## Proposed Renames
 
-### Definite Renames
+### Summary Table
 
-| Current Name | Proposed Name | Rationale |
-|--------------|---------------|-----------|
-| `ap-move-lights` | `ap-raw-lights-to-blink` | Clearly states: raw light frames → blink stage |
-| `ap-move-calibration` | `ap-master-to-library` | Clearly states: master frames → calibration library |
+| Current | Proposed | Pattern | Rationale |
+|---------|----------|---------|-----------|
+| `ap-move-lights` | `ap-raw-light-to-blink` | qualifier-noun-to-dest | Raw lights from capture → blink |
+| `ap-cull-lights` | `ap-cull-light` | verb-noun | Cull (reject) poor quality lights |
+| `ap-fits-headers` | `ap-preserve-header` | verb-noun | Preserve path metadata into header |
+| `ap-master-calibration` | `ap-create-master` | verb-noun | Create masters from raw calibration |
+| `ap-move-calibration` | `ap-master-to-library` | noun-to-dest | Masters → library |
+| `ap-common` | `ap-common` | — | Shared utilities (no change) |
 
-### New Projects Needed
+### New Projects
 
-| Project Name | Purpose |
-|--------------|---------|
-| `ap-master-to-blink` | Copy matching calibration masters from library into blink directory for a target |
-| `ap-library-to-blink` | Alternative name - "library" emphasizes the source is the organized library |
+| Name | Pattern | Purpose |
+|------|---------|---------|
+| `ap-master-to-blink` | noun-to-dest | Copy matching masters from library → blink for a target |
+| `ap-calibrate-light` | verb-noun | Apply masters to lights (future) |
+| `ap-light-to-data` | noun-to-dest | Move accepted lights from blink → data (future) |
 
-### Projects to Keep As-Is
+## Detailed Analysis
 
-| Current Name | Rationale |
-|--------------|-----------|
-| `ap-common` | Generic utility library, not tied to data flow |
-| `ap-cull-lights` | "Cull" is a clear, specific verb describing the action |
-| `ap-fits-headers` | Describes what it operates on (FITS headers) |
-| `ap-master-calibration` | Describes what it creates (master calibration frames) |
+### ap-raw-light-to-blink (was: ap-move-lights)
 
-### Alternative Considerations
+**Pattern:** `qualifier-noun-to-destination`
 
-#### ap-cull-lights
-Could become `ap-lights-to-reject` to follow the "to" pattern, but:
-- "cull" is a well-understood term in photography/astrophotography
-- The action is more about evaluating/filtering than moving
-- **Recommendation**: Keep as `ap-cull-lights`
+The tool moves raw light frames from NINA capture directory into the organized `10_Blink` structure.
 
-#### ap-fits-headers
-Could become `ap-path-to-headers` to describe the action, but:
-- Current name describes what it modifies
-- The "path to headers" action is implicit
-- **Recommendation**: Keep as `ap-fits-headers`
-
-#### ap-master-calibration
-Could become:
-- `ap-raw-calibration-to-master` - follows pattern but very long
-- `ap-integrate-calibration` - describes the PixInsight action
-- `ap-create-masters` - simple and clear
-- **Recommendation**: Keep as `ap-master-calibration` (creates master calibration frames)
-
-## Complete Naming Scheme
-
-### Final Recommendations
-
-```
-CURRENT                    →    PROPOSED
-─────────────────────────────────────────────────
-ap-common                       ap-common (no change)
-ap-move-lights             →    ap-raw-lights-to-blink
-ap-cull-lights                  ap-cull-lights (no change)
-ap-fits-headers                 ap-fits-headers (no change)
-ap-master-calibration           ap-master-calibration (no change)
-ap-move-calibration        →    ap-master-to-library
-(new)                      →    ap-master-to-blink
-(future?)                  →    ap-library-match (find matching masters)
+```mermaid
+flowchart LR
+    RAW[Raw Light<br/>from capture] --> TOOL[ap-raw-light-to-blink]
+    TOOL --> BLINK[10_Blink/<br/>target/DATE/FILTER_EXP/]
 ```
 
-## Workflow with New Names
+### ap-cull-light (was: ap-cull-lights)
 
-```bash
-#!/bin/bash
-# Complete workflow with proposed naming
+**Pattern:** `verb-noun`
 
-# Stage 1: Organize raw lights into blink directory
-python -m ap_raw_lights_to_blink /capture/tonight /data
+The tool culls (rejects) lights based on HFR and RMS thresholds.
 
-# Stage 2: Cull poor quality frames
-python -m ap_cull_lights /data/*/10_Blink /reject --max-hfr 2.5 --max-rms 2.0
-
-# Stage 3: Preserve path metadata in headers
-python -m ap_fits_headers /data --include CAMERA OPTIC FILTER
-
-# Stage 4: Create master calibration frames
-python -m ap_master_calibration /calibration/raw /calibration/output \
-    --pixinsight-binary "/path/to/PixInsight"
-
-# Stage 5: Organize masters into library
-python -m ap_master_to_library /calibration/output/master /calibration/library
-
-# Stage 6: Copy matching masters into blink directory for calibration
-python -m ap_master_to_blink /calibration/library /data/*/10_Blink/M42
+```mermaid
+flowchart LR
+    LIGHT[Light in blink] --> TOOL[ap-cull-light]
+    TOOL --> KEEP[Keep]
+    TOOL --> REJECT[Reject]
 ```
 
-## Migration Impact
+### ap-preserve-header (was: ap-fits-headers)
 
-### Repository Renames Required
-1. `jewzaam/ap-move-lights` → `jewzaam/ap-raw-lights-to-blink`
-2. `jewzaam/ap-move-calibration` → `jewzaam/ap-master-to-library`
+**Pattern:** `verb-noun`
 
-### Package/Module Renames
-- `ap_move_lights` → `ap_raw_lights_to_blink`
-- `ap_move_calibration` → `ap_master_to_library`
+The tool preserves path-encoded metadata into the file header. The key insight: we're not modifying FITS specifically—we're preserving information that would otherwise be lost.
 
-### Documentation Updates
-- All workflow docs reference old names
-- README badges and links
-- Installation instructions
+```mermaid
+flowchart LR
+    PATH["/CAMERA_ASI294/OPTIC_C8E/img.fits"] --> TOOL[ap-preserve-header]
+    TOOL --> HEADER["Header: CAMERA=ASI294, OPTIC=C8E"]
+```
 
-### Git Submodule Updates (ap-base)
-- Update `.gitmodules` with new repository names
-- Update `patches/` directory names
-- Update `Makefile` targets
+**Alternative considered:** `ap-path-to-header` — describes the source/dest but less clear about intent.
 
-## Implementation Order
+### ap-create-master (was: ap-master-calibration)
 
-1. **Create** `ap-master-to-blink` (new functionality)
-2. **Rename** `ap-move-calibration` → `ap-master-to-library`
-3. **Rename** `ap-move-lights` → `ap-raw-lights-to-blink`
-4. **Update** ap-base submodules and documentation
+**Pattern:** `verb-noun`
+
+The tool creates master calibration frames by integrating raw bias/dark/flat frames via PixInsight.
+
+```mermaid
+flowchart LR
+    RAW[Raw bias/dark/flat] --> TOOL[ap-create-master]
+    TOOL --> MASTER[Master frame]
+```
+
+**Note:** "master" is the noun (what we create), not "calibration" which is an adjective describing the type.
+
+### ap-master-to-library (was: ap-move-calibration)
+
+**Pattern:** `noun-to-destination`
+
+The tool moves master frames from PixInsight output into the organized calibration library.
+
+```mermaid
+flowchart LR
+    MASTER[Master from<br/>PixInsight output] --> TOOL[ap-master-to-library]
+    TOOL --> LIBRARY[(Calibration<br/>Library)]
+```
+
+### ap-master-to-blink (new)
+
+**Pattern:** `noun-to-destination`
+
+Copy matching masters from the library into the blink directory for a specific target, enabling calibration.
+
+```mermaid
+flowchart LR
+    LIBRARY[(Calibration<br/>Library)] --> TOOL[ap-master-to-blink]
+    TOOL --> BLINK[10_Blink/<br/>target/calibration/]
+```
+
+**Matching logic:**
+- Read light frame headers in target directory
+- Find matching bias (camera, temp, gain, offset)
+- Find matching dark (+ exposure)
+- Find matching flat (+ filter, nearest date)
+- Copy to target's calibration subdirectory
+
+### ap-calibrate-light (future)
+
+**Pattern:** `verb-noun`
+
+Apply calibration masters to light frames (may wrap PixInsight WBPP or similar).
+
+```mermaid
+flowchart LR
+    LIGHT[Light] --> TOOL[ap-calibrate-light]
+    MASTER[Master] --> TOOL
+    TOOL --> CALIBRATED[Calibrated Light]
+```
+
+### ap-light-to-data (future)
+
+**Pattern:** `noun-to-destination`
+
+Move accepted lights from blink to data stage.
+
+```mermaid
+flowchart LR
+    BLINK[10_Blink/accept/] --> TOOL[ap-light-to-data]
+    TOOL --> DATA[20_Data/]
+```
+
+## Complete Workflow with New Names
+
+```mermaid
+flowchart TB
+    subgraph Capture
+        NINA[NINA]
+    end
+
+    subgraph Ingest
+        RAW_TO_BLINK[ap-raw-light-to-blink]
+        CULL[ap-cull-light]
+        PRESERVE[ap-preserve-header]
+    end
+
+    subgraph Calibration
+        CREATE[ap-create-master]
+        TO_LIB[ap-master-to-library]
+        TO_BLINK[ap-master-to-blink]
+        APPLY[ap-calibrate-light]
+    end
+
+    subgraph Stages
+        BLINK[10_Blink]
+        DATA[20_Data]
+        LIBRARY[(Library)]
+    end
+
+    NINA -->|lights| RAW_TO_BLINK --> BLINK
+    BLINK --> CULL --> PRESERVE --> TO_BLINK
+    TO_BLINK --> APPLY --> DATA
+
+    NINA -->|calibration| CREATE --> TO_LIB --> LIBRARY
+    LIBRARY --> TO_BLINK
+```
+
+## Module/Package Names
+
+Python packages use underscores:
+
+| Project | Package |
+|---------|---------|
+| `ap-raw-light-to-blink` | `ap_raw_light_to_blink` |
+| `ap-cull-light` | `ap_cull_light` |
+| `ap-preserve-header` | `ap_preserve_header` |
+| `ap-create-master` | `ap_create_master` |
+| `ap-master-to-library` | `ap_master_to_library` |
+| `ap-master-to-blink` | `ap_master_to_blink` |
+| `ap-calibrate-light` | `ap_calibrate_light` |
+
+## Migration Checklist
+
+For each renamed project:
+
+- [ ] Create new GitHub repository with new name
+- [ ] Update `pyproject.toml` (name, package name)
+- [ ] Rename package directory
+- [ ] Update imports in code
+- [ ] Update CLI entry points
+- [ ] Update README and badges
+- [ ] Update GitHub Actions workflows
+- [ ] Archive old repository (or redirect)
+
+For ap-base:
+
+- [ ] Update `.gitmodules` with new URLs
+- [ ] Update `patches/` directory
+- [ ] Update `Makefile` targets
+- [ ] Update `docs/` references
+- [ ] Update `CLAUDE.md`
 
 ## Open Questions
 
-1. Should `ap-master-to-blink` copy just the masters, or also set up a PixInsight project?
-2. Is "blink" specific enough, or should we use a more generic term like "workspace"?
-3. Should there be an `ap-lights-to-data` tool to automate moving accepted frames from 10_Blink → 20_Data?
+1. Should `ap-master-to-blink` also set up a PixInsight project, or just copy files?
+2. Is `ap-calibrate-light` a wrapper around WBPP, or a standalone calibration tool?
+3. Do we need `ap-light-to-data`, or is that a manual step (drag/drop in file manager)?
