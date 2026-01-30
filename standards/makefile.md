@@ -6,24 +6,25 @@ Standard Makefile targets for ap-* Python projects.
 
 | Target | Description |
 |--------|-------------|
-| `default` | Run format, lint, test, coverage |
+| `default` | Run format, lint, typecheck, test, coverage |
 | `install` | Install package |
 | `install-dev` | Install in editable mode with dev deps |
 | `uninstall` | Uninstall package |
 | `clean` | Remove build artifacts |
 | `format` | Format code with black |
 | `lint` | Lint with flake8 |
+| `typecheck` | Type check with mypy |
 | `test` | Run pytest |
 | `coverage` | Run pytest with coverage |
 
 ## Template
 
 ```makefile
-.PHONY: install install-dev uninstall clean format lint test test-verbose coverage default
+.PHONY: install install-dev uninstall clean format lint typecheck test test-verbose coverage default
 
 PYTHON := python
 
-default: format lint test coverage
+default: format lint typecheck test coverage
 
 install:
 	$(PYTHON) -m pip install .
@@ -44,6 +45,9 @@ format: install-dev
 
 lint: install-dev
 	$(PYTHON) -m flake8 --max-line-length=88 --extend-ignore=E203,W503 ap_<name> tests
+
+typecheck: install-dev
+	$(PYTHON) -m mypy ap_<name>
 
 test: install-dev
 	$(PYTHON) -m pytest
