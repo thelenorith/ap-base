@@ -36,6 +36,15 @@
 | **delete** | Remove files/frames |
 | **empty** | Clean up (e.g., remove empty directories) |
 
+## Naming Pattern
+
+All tools follow: `ap-{verb}-{qualifier?}-{noun}-to-{destination?}`
+
+- Every tool name starts with a **verb**
+- **Qualifier** (like `raw`) is optional
+- **Noun** is always singular
+- **Destination** is used when the tool moves data somewhere
+
 ## Data Flow
 
 ```mermaid
@@ -47,15 +56,17 @@ flowchart TB
 
     subgraph Pipeline["Processing Pipeline"]
         subgraph LightPath["Light Path"]
-            TO_BLINK[ap-raw-light-to-blink]
+            TO_BLINK[ap-move-raw-light-to-blink]
             CULL[ap-cull-light]
             PRESERVE[ap-preserve-header]
             CALIBRATE[ap-calibrate-light]
+            TO_DATA[ap-move-light-to-data]
         end
 
         subgraph MasterPath["Master Path"]
             CREATE[ap-create-master]
-            TO_LIB[ap-master-to-library]
+            TO_LIB[ap-move-master-to-library]
+            MASTER_BLINK[ap-move-master-to-blink]
         end
     end
 
@@ -69,11 +80,11 @@ flowchart TB
     RAW_LIGHT --> TO_BLINK --> BLINK
     BLINK --> CULL --> REJECT
     CULL --> PRESERVE
-    PRESERVE --> CALIBRATE --> DATA
+    PRESERVE --> MASTER_BLINK
+    MASTER_BLINK --> CALIBRATE --> TO_DATA --> DATA
 
     RAW_CAL --> CREATE --> TO_LIB --> LIBRARY
-    LIBRARY --> |ap-master-to-blink| BLINK
-    LIBRARY --> CALIBRATE
+    LIBRARY --> MASTER_BLINK
 ```
 
 ## Proposed Renames
@@ -82,32 +93,32 @@ flowchart TB
 
 | Current | Proposed | Pattern | Rationale |
 |---------|----------|---------|-----------|
-| `ap-move-lights` | `ap-raw-light-to-blink` | qualifier-noun-to-dest | Raw lights from capture → blink |
+| `ap-move-lights` | `ap-move-raw-light-to-blink` | verb-qualifier-noun-to-dest | Move raw lights from capture → blink |
 | `ap-cull-lights` | `ap-cull-light` | verb-noun | Cull (reject) poor quality lights |
 | `ap-fits-headers` | `ap-preserve-header` | verb-noun | Preserve path metadata into header |
 | `ap-master-calibration` | `ap-create-master` | verb-noun | Create masters from raw calibration |
-| `ap-move-calibration` | `ap-master-to-library` | noun-to-dest | Masters → library |
+| `ap-move-calibration` | `ap-move-master-to-library` | verb-noun-to-dest | Move masters → library |
 | `ap-common` | `ap-common` | — | Shared utilities (no change) |
 
 ### New Projects
 
 | Name | Pattern | Purpose |
 |------|---------|---------|
-| `ap-master-to-blink` | noun-to-dest | Copy matching masters from library → blink for a target |
-| `ap-calibrate-light` | verb-noun | Apply masters to lights (future) |
-| `ap-light-to-data` | noun-to-dest | Move accepted lights from blink → data (future) |
+| `ap-move-master-to-blink` | verb-noun-to-dest | Copy matching masters from library → blink for a target |
+| `ap-calibrate-light` | verb-noun | Apply masters to lights |
+| `ap-move-light-to-data` | verb-noun-to-dest | Move accepted lights from blink → data (future) |
 
 ## Detailed Analysis
 
-### ap-raw-light-to-blink (was: ap-move-lights)
+### ap-move-raw-light-to-blink (was: ap-move-lights)
 
-**Pattern:** `qualifier-noun-to-destination`
+**Pattern:** `verb-qualifier-noun-to-destination`
 
 The tool moves raw light frames from NINA capture directory into the organized `10_Blink` structure.
 
 ```mermaid
 flowchart LR
-    RAW[Raw Light<br/>from capture] --> TOOL[ap-raw-light-to-blink]
+    RAW[Raw Light<br/>from capture] --> TOOL[ap-move-raw-light-to-blink]
     TOOL --> BLINK[10_Blink/<br/>target/DATE/FILTER_EXP/]
 ```
 
@@ -136,8 +147,6 @@ flowchart LR
     TOOL --> HEADER["Header: CAMERA=ASI294, OPTIC=C8E"]
 ```
 
-**Alternative considered:** `ap-path-to-header` — describes the source/dest but less clear about intent.
-
 ### ap-create-master (was: ap-master-calibration)
 
 **Pattern:** `verb-noun`
@@ -150,29 +159,27 @@ flowchart LR
     TOOL --> MASTER[Master frame]
 ```
 
-**Note:** "master" is the noun (what we create), not "calibration" which is an adjective describing the type.
+### ap-move-master-to-library (was: ap-move-calibration)
 
-### ap-master-to-library (was: ap-move-calibration)
-
-**Pattern:** `noun-to-destination`
+**Pattern:** `verb-noun-to-destination`
 
 The tool moves master frames from PixInsight output into the organized calibration library.
 
 ```mermaid
 flowchart LR
-    MASTER[Master from<br/>PixInsight output] --> TOOL[ap-master-to-library]
+    MASTER[Master from<br/>PixInsight output] --> TOOL[ap-move-master-to-library]
     TOOL --> LIBRARY[(Calibration<br/>Library)]
 ```
 
-### ap-master-to-blink (new)
+### ap-move-master-to-blink (new)
 
-**Pattern:** `noun-to-destination`
+**Pattern:** `verb-noun-to-destination`
 
 Copy matching masters from the library into the blink directory for a specific target, enabling calibration.
 
 ```mermaid
 flowchart LR
-    LIBRARY[(Calibration<br/>Library)] --> TOOL[ap-master-to-blink]
+    LIBRARY[(Calibration<br/>Library)] --> TOOL[ap-move-master-to-blink]
     TOOL --> BLINK[10_Blink/<br/>target/calibration/]
 ```
 
@@ -183,7 +190,7 @@ flowchart LR
 - Find matching flat (+ filter, nearest date)
 - Copy to target's calibration subdirectory
 
-### ap-calibrate-light (future)
+### ap-calibrate-light (new)
 
 **Pattern:** `verb-noun`
 
@@ -196,15 +203,15 @@ flowchart LR
     TOOL --> CALIBRATED[Calibrated Light]
 ```
 
-### ap-light-to-data (future)
+### ap-move-light-to-data (future)
 
-**Pattern:** `noun-to-destination`
+**Pattern:** `verb-noun-to-destination`
 
 Move accepted lights from blink to data stage.
 
 ```mermaid
 flowchart LR
-    BLINK[10_Blink/accept/] --> TOOL[ap-light-to-data]
+    BLINK[10_Blink/accept/] --> TOOL[ap-move-light-to-data]
     TOOL --> DATA[20_Data/]
 ```
 
@@ -217,16 +224,20 @@ flowchart TB
     end
 
     subgraph Ingest
-        RAW_TO_BLINK[ap-raw-light-to-blink]
+        RAW_TO_BLINK[ap-move-raw-light-to-blink]
         CULL[ap-cull-light]
         PRESERVE[ap-preserve-header]
     end
 
     subgraph Calibration
         CREATE[ap-create-master]
-        TO_LIB[ap-master-to-library]
-        TO_BLINK[ap-master-to-blink]
+        TO_LIB[ap-move-master-to-library]
+        TO_BLINK[ap-move-master-to-blink]
         APPLY[ap-calibrate-light]
+    end
+
+    subgraph Promotion
+        TO_DATA[ap-move-light-to-data]
     end
 
     subgraph Stages
@@ -237,7 +248,7 @@ flowchart TB
 
     NINA -->|lights| RAW_TO_BLINK --> BLINK
     BLINK --> CULL --> PRESERVE --> TO_BLINK
-    TO_BLINK --> APPLY --> DATA
+    TO_BLINK --> APPLY --> TO_DATA --> DATA
 
     NINA -->|calibration| CREATE --> TO_LIB --> LIBRARY
     LIBRARY --> TO_BLINK
@@ -249,13 +260,14 @@ Python packages use underscores:
 
 | Project | Package |
 |---------|---------|
-| `ap-raw-light-to-blink` | `ap_raw_light_to_blink` |
+| `ap-move-raw-light-to-blink` | `ap_move_raw_light_to_blink` |
 | `ap-cull-light` | `ap_cull_light` |
 | `ap-preserve-header` | `ap_preserve_header` |
 | `ap-create-master` | `ap_create_master` |
-| `ap-master-to-library` | `ap_master_to_library` |
-| `ap-master-to-blink` | `ap_master_to_blink` |
+| `ap-move-master-to-library` | `ap_move_master_to_library` |
+| `ap-move-master-to-blink` | `ap_move_master_to_blink` |
 | `ap-calibrate-light` | `ap_calibrate_light` |
+| `ap-move-light-to-data` | `ap_move_light_to_data` |
 
 ## Migration Checklist
 
@@ -280,6 +292,6 @@ For ap-base:
 
 ## Open Questions
 
-1. Should `ap-master-to-blink` also set up a PixInsight project, or just copy files?
+1. Should `ap-move-master-to-blink` also set up a PixInsight project, or just copy files?
 2. Is `ap-calibrate-light` a wrapper around WBPP, or a standalone calibration tool?
-3. Do we need `ap-light-to-data`, or is that a manual step (drag/drop in file manager)?
+3. Do we need `ap-move-light-to-data`, or is that a manual step (drag/drop in file manager)?
