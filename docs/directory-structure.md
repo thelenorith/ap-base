@@ -156,13 +156,13 @@ $$IMAGETYPE$$\$$TELESCOPE$$+$$CAMERA$$\$$TARGETNAME$$\DATE_$$DATEMINUS12$$\FILTE
 
 NOTE: `RMSAC` is used but the "C" is probably a typo.. but it has persevered through scripts so just go with it..
 
-The `ap-move-lights` tool reorganizes this into the data directory structure.  And `ap-cull-lights` rejects outliers based on HFR and RMS values.
+The `ap-move-raw-light-to-blink` tool reorganizes this into the data directory structure.  And `ap-cull-light` rejects outliers based on HFR and RMS values.
 
 ## Reject Directory Structure
 
-Rejected frames maintain their relative structure.  If run _after_ `ap-move-lights` you will see the exact original structure, making it very easy to identify what is what.
+Rejected frames maintain their relative structure.  If run _after_ `ap-move-raw-light-to-blink` you will see the exact original structure, making it very easy to identify what is what.
 
-HINT: if in a bind, you can always run `ap-move-lights` against the rejected files or any other directory with raw lights and it will reorganize it for you again!
+HINT: if in a bind, you can always run `ap-move-raw-light-to-blink` against the rejected files or any other directory with raw lights and it will reorganize it for you again!
 
 ## Environment Variables
 

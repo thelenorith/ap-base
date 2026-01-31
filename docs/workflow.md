@@ -12,23 +12,23 @@ flowchart TB
     end
 
     subgraph Stage2["Stage 2: Ingest & Quality Control"]
-        RAW_Light --> MOVE[ap-move-lights]
+        RAW_Light --> MOVE[ap-move-raw-light-to-blink]
         MOVE --> BLINK[10_Blink Directory]
-        BLINK --> CULL[ap-cull-lights]
+        BLINK --> CULL[ap-cull-light]
         CULL --> REJECT[Reject Directory]
         CULL --> QUALITY[Quality Frames]
     end
 
     subgraph Stage3["Stage 3: Metadata & Review"]
-        QUALITY --> HEADERS[ap-fits-headers]
+        QUALITY --> HEADERS[ap-preserve-header]
         HEADERS --> MANUAL[Manual Blink Review]
         MANUAL --> ACCEPT[Accept Directory]
     end
 
     subgraph Stage4["Stage 4: Calibration"]
-        RAW_Calibration --> MASTER[ap-master-calibration]
+        RAW_Calibration --> MASTER[ap-create-master]
         MASTER --> MASTERS[Master Frames]
-        MASTERS --> ORGANIZE[ap-move-calibration]
+        MASTERS --> ORGANIZE[ap-move-master-to-library]
         ORGANIZE --> LIBRARY[Calibration Library]
     end
 
@@ -57,7 +57,7 @@ Images are captured using NINA (Nighttime Imaging 'N' Astronomy) and saved to a 
 python -m ap_move_lights <raw_dir> <dest_dir> [options]
 ```
 
-The `ap-move-lights` tool:
+The `ap-move-raw-light-to-blink` tool:
 1. Scans raw directory for FITS/XISF files
 2. Reads headers to extract metadata (camera, optic, target, date, filter)
 3. Moves LIGHT frames to organized directory structure
@@ -89,7 +89,7 @@ flowchart LR
 python -m ap_cull_lights <source_dir> <reject_dir> --max-hfr 2.5 --max-rms 2.0 [options]
 ```
 
-The `ap-cull-lights` tool:
+The `ap-cull-light` tool:
 1. Scans for LIGHT frames
 2. Reads HFR (Half Flux Radius) and RMS (guiding error) from headers
 3. Groups files by directory for batch processing
@@ -149,7 +149,7 @@ Move approved frames to the `accept/` subdirectory.
 python -m ap_master_calibration <input_dir> <output_dir> --pixinsight-binary "/path/to/PixInsight" [options]
 ```
 
-The `ap-master-calibration` tool:
+The `ap-create-master` tool:
 1. Discovers and groups calibration frames by FITS keywords
 2. Generates master bias, dark, and flat frames using PixInsight
 3. Calibrates flats with bias/dark masters
@@ -192,7 +192,7 @@ flowchart TB
 python -m ap_move_calibration <source_dir> <library_dir> [options]
 ```
 
-The `ap-move-calibration` tool organizes master frames into a library structure:
+The `ap-move-master-to-library` tool organizes master frames into a library structure:
 
 ```
 {library_dir}/
@@ -269,6 +269,6 @@ echo "Processing complete!"
 
 1. **Always use `--dryrun` first** - Preview changes before executing
 2. **Group files before culling** - Organize by target/session for proper batch processing
-3. **Preserve headers early** - Run `ap-fits-headers` before generating masters
+3. **Preserve headers early** - Run `ap-preserve-header` before generating masters
 4. **Stage calibration generation** - Generate bias/darks first, then flats
 5. **Use consistent naming** - Let the tools handle organization based on metadata

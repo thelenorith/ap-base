@@ -13,11 +13,11 @@ flowchart TB
     end
 
     subgraph Processing["Processing Pipeline"]
-        ML[ap-move-lights]
-        CL[ap-cull-lights]
-        FH[ap-fits-headers]
-        MC[ap-master-calibration]
-        MV[ap-move-calibration]
+        ML[ap-move-raw-light-to-blink]
+        CL[ap-cull-light]
+        FH[ap-preserve-header]
+        MC[ap-create-master]
+        MV[ap-move-master-to-library]
     end
 
     subgraph Libraries
@@ -39,11 +39,11 @@ flowchart TB
 | Tool | Purpose |
 |------|---------|
 | [ap-common](tools/ap-common.md) | Shared utilities for data handling |
-| [ap-move-lights](tools/ap-move-lights.md) | Organize light frames by metadata |
-| [ap-cull-lights](tools/ap-cull-lights.md) | Quality control filtering |
-| [ap-fits-headers](tools/ap-fits-headers.md) | Preserve path metadata in FITS headers |
-| [ap-master-calibration](tools/ap-master-calibration.md) | Generate master calibration frames |
-| [ap-move-calibration](tools/ap-move-calibration.md) | Organize calibration library |
+| [ap-move-raw-light-to-blink](tools/ap-move-raw-light-to-blink.md) | Organize light frames by metadata |
+| [ap-cull-light](tools/ap-cull-light.md) | Quality control filtering |
+| [ap-preserve-header](tools/ap-preserve-header.md) | Preserve path metadata in FITS headers |
+| [ap-create-master](tools/ap-create-master.md) | Generate master calibration frames |
+| [ap-move-master-to-library](tools/ap-move-master-to-library.md) | Organize calibration library |
 
 ## Quick Start
 
@@ -52,11 +52,11 @@ flowchart TB
 All tools can be installed from git:
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-move-lights.git
-pip install git+https://github.com/jewzaam/ap-cull-lights.git
-pip install git+https://github.com/jewzaam/ap-fits-headers.git
-pip install git+https://github.com/jewzaam/ap-master-calibration.git
-pip install git+https://github.com/jewzaam/ap-move-calibration.git
+pip install git+https://github.com/jewzaam/ap-move-raw-light-to-blink.git
+pip install git+https://github.com/jewzaam/ap-cull-light.git
+pip install git+https://github.com/jewzaam/ap-preserve-header.git
+pip install git+https://github.com/jewzaam/ap-create-master.git
+pip install git+https://github.com/jewzaam/ap-move-master-to-library.git
 ```
 
 The `ap-common` package is installed automatically as a dependency.

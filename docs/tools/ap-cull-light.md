@@ -1,15 +1,15 @@
-# ap-cull-lights
+# ap-cull-light
 
 Quality control filtering for light frames based on HFR and RMS thresholds.
 
 ## Overview
 
-`ap-cull-lights` evaluates light frames against quality thresholds and moves rejected frames to a separate directory while preserving structure.
+`ap-cull-light` evaluates light frames against quality thresholds and moves rejected frames to a separate directory while preserving structure.
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-cull-lights.git
+pip install git+https://github.com/jewzaam/ap-cull-light.git
 ```
 
 ## Usage
@@ -101,4 +101,4 @@ Rejected frames are moved to the reject directory with preserved relative paths:
 
 ## Repository
 
-[github.com/jewzaam/ap-cull-lights](https://github.com/jewzaam/ap-cull-lights)
+[github.com/jewzaam/ap-cull-light](https://github.com/jewzaam/ap-cull-light)

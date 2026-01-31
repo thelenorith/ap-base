@@ -1,15 +1,15 @@
-# ap-move-calibration
+# ap-move-master-to-library
 
 Organize master calibration frames into a structured library.
 
 ## Overview
 
-`ap-move-calibration` copies master calibration frames from a source directory (e.g., PixInsight output) to an organized library structure based on FITS/XISF header metadata.
+`ap-move-master-to-library` copies master calibration frames from a source directory (e.g., PixInsight output) to an organized library structure based on FITS/XISF header metadata.
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-move-calibration.git
+pip install git+https://github.com/jewzaam/ap-move-master-to-library.git
 ```
 
 ## Usage
@@ -132,4 +132,4 @@ The organized structure allows:
 
 ## Repository
 
-[github.com/jewzaam/ap-move-calibration](https://github.com/jewzaam/ap-move-calibration)
+[github.com/jewzaam/ap-move-master-to-library](https://github.com/jewzaam/ap-move-master-to-library)

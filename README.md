@@ -14,16 +14,14 @@ This repository serves three primary functions:
 
 ```
 ap-base/
-├── ap-common/              # Shared utilities and common code
-├── ap-cull-lights/         # Light frame selection/culling
-├── ap-empty-directory/     # Directory cleanup utility
-├── ap-fits-headers/        # FITS header management
-├── ap-master-calibration/  # Master calibration frame creation
-├── ap-move-calibration/    # Calibration frame organization
-├── ap-move-lights/         # Light frame organization
-├── ap-move-lights-to-data/ # Light frame data migration
-├── legacy/
-│   └── brave-new-world/    # Legacy codebase for reference
+├── ap-common/                   # Shared utilities and common code
+├── ap-cull-light/               # Light frame selection/culling
+├── ap-create-master/            # Master calibration frame creation
+├── ap-empty-directory/          # Directory cleanup utility
+├── ap-move-light-to-data/       # Light frame data migration
+├── ap-move-master-to-library/   # Calibration frame organization
+├── ap-move-raw-light-to-blink/  # Light frame organization
+├── ap-preserve-header/          # FITS header management
 ├── docs/                   # Centralized documentation
 ├── standards/              # Project standards and conventions
 ├── Makefile                # Submodule management
@@ -103,12 +101,12 @@ git commit -m "Update README to match ap-base standards"
 git push
 
 # Repeat for other submodules
-cd ../ap-cull-lights
+cd ../ap-cull-light
 # ... make similar changes ...
 
 # Update ap-base to reference new commits
 cd ..
-git add ap-common ap-cull-lights  # ... other updated submodules
+git add ap-common ap-cull-light  # ... other updated submodules
 git commit -m "Update submodule references after README standardization"
 git push
 ```

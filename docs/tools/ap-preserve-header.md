@@ -1,15 +1,15 @@
-# ap-fits-headers
+# ap-preserve-header
 
 Preserve metadata from file paths into FITS/XISF headers.
 
 ## Overview
 
-`ap-fits-headers` extracts key-value pairs encoded in directory paths and filenames and writes them as FITS header keywords. This is useful when metadata cannot be captured in headers at acquisition time.
+`ap-preserve-header` extracts key-value pairs encoded in directory paths and filenames and writes them as FITS header keywords. This is useful when metadata cannot be captured in headers at acquisition time.
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-fits-headers.git
+pip install git+https://github.com/jewzaam/ap-preserve-header.git
 ```
 
 ## Usage
@@ -111,4 +111,4 @@ python -m ap_fits_headers /archive/2025 --include CAMERA OPTIC
 
 ## Repository
 
-[github.com/jewzaam/ap-fits-headers](https://github.com/jewzaam/ap-fits-headers)
+[github.com/jewzaam/ap-preserve-header](https://github.com/jewzaam/ap-preserve-header)

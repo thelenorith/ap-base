@@ -12,14 +12,14 @@ This repository serves as a monorepo aggregating all astrophotography pipeline p
 
 ```
 ap-base/
-├── ap-common/           # Shared utilities and common code
-├── ap-cull-lights/      # Light frame selection/culling
-├── ap-fits-headers/     # FITS header management
-├── ap-master-calibration/  # Master calibration frame creation
-├── ap-move-calibration/ # Calibration frame organization
-├── ap-move-lights/      # Light frame organization
-├── legacy/
-│   └── brave-new-world/ # Legacy codebase for reference
+├── ap-common/                   # Shared utilities and common code
+├── ap-cull-light/               # Light frame selection/culling
+├── ap-create-master/            # Master calibration frame creation
+├── ap-empty-directory/          # Directory cleanup utility
+├── ap-move-light-to-data/       # Light frame data migration
+├── ap-move-master-to-library/   # Calibration frame organization
+├── ap-move-raw-light-to-blink/  # Light frame organization
+├── ap-preserve-header/          # FITS header management
 ├── patches/             # Git patches organized by branch name
 ├── standards/           # Project standards documentation
 ├── Makefile             # Patch application workflow
@@ -56,7 +56,7 @@ Patches are organized by branch name in subdirectories:
 patches/
 ├── readme-crosslinks-20260130/
 │   ├── ap-common.patch
-│   ├── ap-cull-lights.patch
+│   ├── ap-cull-light.patch
 │   └── ...
 └── makefile-fixes-20260201/
     └── ap-common.patch

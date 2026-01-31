@@ -20,26 +20,23 @@ This skill commits changes in git submodules individually, with commit messages 
 
 ## Process
 
-### 1. Identify submodules with changes
+### 1. List all submodules
 
 ```bash
-# Check which submodules have changes
-git submodule foreach 'git status --short'
+# List all submodule paths
+git submodule foreach 'echo $path'
 ```
 
-### 2. For EACH submodule with staged changes
+### 2. For EACH submodule, check and commit if needed
 
-Iterate through submodules in this order:
-- ap-common
-- ap-cull-lights
-- ap-fits-headers
-- ap-master-calibration
-- ap-move-calibration
-- ap-move-lights
+For each submodule path from step 1:
 
-Skip legacy/brave-new-world (legacy codebase).
+1. `cd` into the submodule
+2. Run `git status --short` to check for staged changes
+3. If no staged changes (empty output), skip to next submodule
+4. If staged changes exist (output shows M, A, D, R, C, or U in first column), proceed with review and commit
 
-### 3. Review each submodule's changes
+### 3. Review submodule's changes
 
 For each submodule:
 
@@ -100,23 +97,35 @@ Report any unstaged changes.
 ## Example Workflow
 
 ```bash
-# For ap-common
+# List all submodules
+git submodule foreach 'echo $path'
+# Output: ap-common, ap-cull-light, ap-preserve-header, etc.
+
+# Check ap-common
 cd ap-common
-git status
+git status --short
+# Output shows staged changes
 git diff --staged
 # Review changes, write commit message based on ap-common changes only
 git commit -m "..."
 cd ..
 
-# For ap-cull-lights
-cd ap-cull-lights
-git status
+# Check ap-cull-light
+cd ap-cull-light
+git status --short
+# No staged changes, skip
+cd ..
+
+# Check ap-preserve-header
+cd ap-preserve-header
+git status --short
+# Output shows staged changes
 git diff --staged
-# Review changes, write commit message based on ap-cull-lights changes only
+# Review changes, write commit message based on ap-preserve-header changes only
 git commit -m "..."
 cd ..
 
-# ... repeat for each submodule with changes
+# ... repeat for all submodules
 ```
 
 ## Committing Base Repo vs Submodules

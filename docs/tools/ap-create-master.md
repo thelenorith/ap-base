@@ -1,15 +1,15 @@
-# ap-master-calibration
+# ap-create-master
 
 Automated generation of master calibration frames using PixInsight.
 
 ## Overview
 
-`ap-master-calibration` discovers calibration frames, groups them by metadata, and generates master bias, dark, and flat frames using PixInsight.
+`ap-create-master` discovers calibration frames, groups them by metadata, and generates master bias, dark, and flat frames using PixInsight.
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-master-calibration.git
+pip install git+https://github.com/jewzaam/ap-create-master.git
 ```
 
 ## Requirements
@@ -177,4 +177,4 @@ python -m ap_master_calibration /calibration /output --script-only
 
 ## Repository
 
-[github.com/jewzaam/ap-master-calibration](https://github.com/jewzaam/ap-master-calibration)
+[github.com/jewzaam/ap-create-master](https://github.com/jewzaam/ap-create-master)

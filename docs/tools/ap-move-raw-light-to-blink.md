@@ -1,15 +1,15 @@
-# ap-move-lights
+# ap-move-raw-light-to-blink
 
 Move and organize light frames from raw capture to organized directory structure.
 
 ## Overview
 
-`ap-move-lights` reads FITS headers to extract metadata and organizes light frames into a multi-stage workflow directory structure.
+`ap-move-raw-light-to-blink` reads FITS headers to extract metadata and organizes light frames into a multi-stage workflow directory structure.
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/jewzaam/ap-move-lights.git
+pip install git+https://github.com/jewzaam/ap-move-raw-light-to-blink.git
 ```
 
 ## Usage
@@ -71,4 +71,4 @@ python -m ap_move_lights /capture /data --blink-dir "00_Review"
 
 ## Repository
 
-[github.com/jewzaam/ap-move-lights](https://github.com/jewzaam/ap-move-lights)
+[github.com/jewzaam/ap-move-raw-light-to-blink](https://github.com/jewzaam/ap-move-raw-light-to-blink)
