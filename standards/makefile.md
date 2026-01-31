@@ -2,6 +2,15 @@
 
 Standard Makefile targets for ap-* Python projects.
 
+## Default Target
+
+Running `make` without specifying a target runs the `default` target, which executes all validation steps (format, lint, typecheck, test, coverage). This ensures code quality checks are easy to run.
+
+```bash
+make           # Runs default target (all validations)
+make default   # Same as above (explicit)
+```
+
 ## Required Targets
 
 | Target | Description |

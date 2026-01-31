@@ -20,11 +20,10 @@ ap-base/
 ├── ap-move-master-to-library/   # Calibration frame organization
 ├── ap-move-raw-light-to-blink/  # Light frame organization
 ├── ap-preserve-header/          # FITS header management
-├── patches/             # Git patches organized by branch name
+├── docs/                # Centralized documentation
 ├── standards/           # Project standards documentation
-├── Makefile             # Patch application workflow
+├── Makefile             # Development and validation targets
 ├── CLAUDE.md            # This file (workflow instructions)
-├── PATCHING.md          # Detailed patching workflow documentation
 └── .gitmodules          # Submodule configuration
 ```
 
@@ -33,7 +32,6 @@ ap-base/
 - Upstream owner: `jewzaam`
 - Fork owner: `thelenorith`
 - All submodules reference the upstream `jewzaam` repos
-- Patches are pushed to `thelenorith` fork branches
 
 ## Multi-Repo Workflow with Claude Sessions
 
@@ -41,60 +39,23 @@ ap-base/
 
 Claude Code sessions are scoped to a single repository for git push access. When working from `ap-base`, changes can be analyzed and prepared for submodules, but cannot be pushed directly to them.
 
-### Patch-Based Workflow
+### Working with Submodules
 
-Changes for submodules are stored as git patches in `patches/`. This allows:
-- Precise, reviewable diffs
-- Automated application via Makefile
-- Local execution bypasses session limitations
+To make changes to submodules:
 
-### Patches Directory
+1. Initialize submodules with clean state:
+   ```bash
+   make deinit
+   make init
+   ```
 
-Patches are organized by branch name in subdirectories:
+2. Navigate into the specific submodule:
+   ```bash
+   cd ap-common
+   # make changes, commit, push
+   ```
 
-```text
-patches/
-├── readme-crosslinks-20260130/
-│   ├── ap-common.patch
-│   ├── ap-cull-light.patch
-│   └── ...
-└── makefile-fixes-20260201/
-    └── ap-common.patch
-```
-
-Branch naming convention: `<description>-<YYYYMMDD>`
-
-### Quick Reference
-
-```bash
-# Clean slate - ALWAYS start here
-make deinit
-make init
-
-# Check available patches
-make status
-make status BRANCH=readme-crosslinks-20260130
-
-# Apply and push patches
-make apply-patches BRANCH=readme-crosslinks-20260130
-make push-patches BRANCH=readme-crosslinks-20260130
-
-# Reset submodules
-make clean-patches
-```
-
-**See [PATCHING.md](PATCHING.md) for detailed workflow documentation.**
-
-### Creating Patches (Claude Sessions)
-
-When working in a Claude session, always start with clean submodules:
-
-```bash
-make deinit
-make init
-```
-
-Then create patches following the workflow in [PATCHING.md](PATCHING.md).
+3. Each submodule is its own git repository and can be modified independently.
 
 ## Project Standards
 

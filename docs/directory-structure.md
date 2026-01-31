@@ -8,9 +8,7 @@ This document describes the directory structures used by the astrophotography pi
 flowchart TB
     subgraph Raw["Raw Capture"]
         RAW_LIGHTS[Lights]
-        RAW_BIAS[Bias]
-        RAW_DARK[Darks]
-        RAW_FLAT[Flats]
+        RAW_CAL[Raw Calibration<br>Bias/Dark/Flat]
     end
 
     subgraph Data["Data Directory"]
@@ -22,7 +20,13 @@ flowchart TB
         DONE[60_Done]
     end
 
-    subgraph Calibration["Calibration Library"]
+    subgraph Calibration["Calibration Processing"]
+        CREATE[ap-create-master<br>Integration]
+        MASTERS[Master Frames]
+        ORGANIZE[ap-move-master-to-library]
+    end
+
+    subgraph Library["Calibration Library"]
         BIAS_LIB[MASTER BIAS/]
         DARK_LIB[MASTER DARK/]
         FLAT_LIB[MASTER FLAT/]
@@ -31,14 +35,16 @@ flowchart TB
     RAW_LIGHTS --> BLINK
     BLINK --> DATA --> MASTER --> PROCESS --> BAKE --> DONE
 
-    RAW_BIAS --> BIAS_LIB
-    RAW_DARK --> DARK_LIB
-    RAW_FLAT --> FLAT_LIB
+    RAW_CAL --> CREATE
+    CREATE --> MASTERS
+    MASTERS --> ORGANIZE
+    ORGANIZE --> BIAS_LIB
+    ORGANIZE --> DARK_LIB
+    ORGANIZE --> FLAT_LIB
 
-    BIAS_LIB -.-> FLAT_LIB
-    DARK_LIB -.-> FLAT_LIB
-    FLAT_LIB -.-> BLINK
-    DARK_LIB -.-> BLINK
+    BIAS_LIB -.->|"Copy to Blink"| BLINK
+    DARK_LIB -.->|"Copy to Blink"| BLINK
+    FLAT_LIB -.->|"Copy to Blink"| BLINK
 ```
 
 ## Data Directory Structure

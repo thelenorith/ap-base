@@ -13,25 +13,38 @@ flowchart TB
     end
 
     subgraph Processing["Processing Pipeline"]
+        PH[ap-preserve-header]
         ML[ap-move-raw-light-to-blink]
         CL[ap-cull-light]
-        FH[ap-preserve-header]
         MC[ap-create-master]
         MV[ap-move-master-to-library]
+        CP[ap-copy-master-to-blink]
+        MD[ap-move-light-to-data]
     end
 
-    subgraph Libraries
+    subgraph Storage["Storage"]
+        BLINK[10_Blink Directory]
         CAL[Calibration Library]
-        DATA[Data Archive]
+        DATA[20_Data Directory]
     end
 
-    NINA --> ML
+    NINA --> PH
+    PH --> ML
+    PH --> MC
     ML --> CL
-    CL --> FH
-    FH --> MC
+    CL --> BLINK
     MC --> MV
     MV --> CAL
-    FH --> DATA
+    CAL --> CP
+    BLINK --> CP
+    CP --> MD
+    MD --> DATA
+
+    classDef processStyle fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+    classDef dataStyle fill:#fff4e6,stroke:#ff9800,stroke-width:2px
+
+    class PH,ML,CL,MC,MV,CP,MD processStyle
+    class NINA,BLINK,CAL,DATA dataStyle
 ```
 
 ## Tools
@@ -41,9 +54,14 @@ flowchart TB
 | [ap-common](tools/ap-common.md) | Shared utilities for data handling |
 | [ap-move-raw-light-to-blink](tools/ap-move-raw-light-to-blink.md) | Organize light frames by metadata |
 | [ap-cull-light](tools/ap-cull-light.md) | Quality control filtering |
+| [ap-empty-directory](tools/ap-empty-directory.md) | Directory cleanup utility |
 | [ap-preserve-header](tools/ap-preserve-header.md) | Preserve path metadata in FITS headers |
 | [ap-create-master](tools/ap-create-master.md) | Generate master calibration frames |
 | [ap-move-master-to-library](tools/ap-move-master-to-library.md) | Organize calibration library |
+| [ap-copy-master-to-blink](tools/ap-copy-master-to-blink.md) | Copy masters from library to blink ⚠️ |
+| [ap-move-light-to-data](tools/ap-move-light-to-data.md) | Move lights when calibration available |
+
+⚠️ Not yet implemented - placeholder documentation only
 
 ## Quick Start
 
@@ -54,6 +72,8 @@ All tools can be installed from git:
 ```bash
 pip install git+https://github.com/jewzaam/ap-move-raw-light-to-blink.git
 pip install git+https://github.com/jewzaam/ap-cull-light.git
+pip install git+https://github.com/jewzaam/ap-empty-directory.git
+pip install git+https://github.com/jewzaam/ap-move-lights-to-data.git
 pip install git+https://github.com/jewzaam/ap-preserve-header.git
 pip install git+https://github.com/jewzaam/ap-create-master.git
 pip install git+https://github.com/jewzaam/ap-move-master-to-library.git
@@ -78,6 +98,15 @@ python -m ap_master_calibration /raw/calibration /output --pixinsight-binary "/p
 
 # 5. Organize calibration library
 python -m ap_move_calibration /output/master /calibration_library
+
+# 6. Clean calibration output directory
+python -m ap_empty_directory /output --recursive
+
+# 7. Copy masters from library to blink directories (not yet implemented)
+# python -m ap_copy_masters_to_blink /calibration_library /data/equipment/10_Blink
+
+# 8. Move lights to data when calibration available
+python -m ap_move_lights_to_data /data/equipment/10_Blink /data/equipment/20_Data
 ```
 
 ## Documentation

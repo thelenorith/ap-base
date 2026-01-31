@@ -2,6 +2,7 @@
 # Submodule management and documentation checks
 
 .PHONY: init deinit install-dev links markdown-lint check help
+.DEFAULT_GOAL := check
 
 PYTHON := python
 SUBMODULES := $(shell git submodule status | awk '{print $$2}' | xargs)
