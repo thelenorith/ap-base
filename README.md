@@ -12,7 +12,7 @@ This repository serves three primary functions:
 
 ## Repository Structure
 
-```
+```text
 ap-base/
 ├── ap-common/                   # Shared utilities and common code
 ├── ap-cull-light/               # Light frame selection/culling

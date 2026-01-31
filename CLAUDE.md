@@ -10,7 +10,7 @@ This repository serves as a monorepo aggregating all astrophotography pipeline p
 
 ## Repository Structure
 
-```
+```text
 ap-base/
 ├── ap-common/                   # Shared utilities and common code
 ├── ap-cull-light/               # Light frame selection/culling
@@ -52,7 +52,7 @@ Changes for submodules are stored as git patches in `patches/`. This allows:
 
 Patches are organized by branch name in subdirectories:
 
-```
+```text
 patches/
 ├── readme-crosslinks-20260130/
 │   ├── ap-common.patch
