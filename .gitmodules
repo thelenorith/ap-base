@@ -19,3 +19,9 @@
 [submodule "legacy/brave-new-world"]
 	path = legacy/brave-new-world
 	url = https://github.com/jewzaam/brave-new-world.git
+[submodule "ap-move-lights-to-data"]
+	path = ap-move-lights-to-data
+	url = https://github.com/jewzaam/ap-move-lights-to-data.git
+[submodule "ap-empty-directory"]
+	path = ap-empty-directory
+	url = https://github.com/jewzaam/ap-empty-directory.git
