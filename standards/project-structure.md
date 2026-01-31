@@ -83,6 +83,7 @@ dev = [
     "pytest-cov>=4.0",
     "black>=23.0",
     "flake8>=6.0",
+    "mypy==1.11.2",
 ]
 
 [tool.setuptools.packages.find]

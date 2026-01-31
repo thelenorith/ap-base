@@ -7,9 +7,10 @@ Standard structure for ap-* project READMEs.
 1. Title
 2. Badges
 3. Brief description (1-2 sentences)
-4. Overview (what it does, key features)
-5. Installation
-6. Usage (with examples)
+4. Documentation links (ap-base boilerplate)
+5. Overview (what it does, key features)
+6. Installation
+7. Usage (with examples)
 
 ## Title
 
@@ -43,6 +44,22 @@ Good:
 
 Bad:
 > This Python package uses astropy to read FITS headers and organize files into directories.
+
+## Documentation Links
+
+All projects must include standard boilerplate linking back to ap-base for comprehensive documentation:
+
+```markdown
+## Documentation
+
+This tool is part of the astrophotography pipeline. For comprehensive documentation including workflow guides and integration with other tools, see:
+
+- **[Pipeline Overview](https://github.com/jewzaam/ap-base/blob/main/docs/index.md)** - Full pipeline documentation
+- **[Workflow Guide](https://github.com/jewzaam/ap-base/blob/main/docs/workflow.md)** - Detailed workflow with diagrams
+- **[ap-<name> Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-<name>.md)** - API reference for this tool
+```
+
+Replace `<name>` with the actual project name (e.g., `ap-common`, `ap-cull-lights`).
 
 ## Overview
 
