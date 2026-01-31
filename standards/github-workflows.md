@@ -8,6 +8,7 @@ Standard CI workflows for ap-* projects.
 |----------|------|---------|
 | Test | `test.yml` | push, PR |
 | Lint | `lint.yml` | push, PR |
+| Typecheck | `typecheck.yml` | push, PR |
 | Format Check | `format.yml` | push, PR |
 | Coverage | `coverage.yml` | push, PR |
 
@@ -74,6 +75,36 @@ jobs:
 
       - name: Run linter
         run: make lint
+```
+
+## typecheck.yml
+
+```yaml
+name: Typecheck
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: make install-dev
+
+      - name: Run type checker
+        run: make typecheck
 ```
 
 ## format.yml
