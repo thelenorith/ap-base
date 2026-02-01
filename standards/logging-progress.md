@@ -64,6 +64,12 @@ logger.debug(f"Header values: {headers}")
 logger.info("Starting calibration process")
 logger.info(f"Found {count} files to process")
 
+# INFO: Multi-parameter information (single statement, key=value format)
+logger.info(
+    f"Executing PixInsight: binary={binary}, script={script}, "
+    f"log={log_file}, instance={instance_id}"
+)
+
 # WARNING: Recoverable issues
 logger.warning(f"Missing optional header key: {key}")
 logger.warning(f"File exists, skipping: {dest}")
@@ -80,6 +86,21 @@ logger.error(f"Invalid header format in {path}")
 | User-facing summaries | Print to stdout |
 | Progress updates | Progress indicators |
 | Primary program output | Print to stdout |
+
+**Anti-Pattern: Multiple log calls with whitespace padding**
+
+```python
+# BAD: Multiple separate log calls with whitespace padding
+logger.info("Executing PixInsight...")
+logger.info(f"  Binary: {binary}")
+logger.info(f"  Script: {script}")
+logger.info(f"  Log: {log_file}")
+
+# GOOD: Single log statement with key=value format
+logger.info(
+    f"Executing PixInsight: binary={binary}, script={script}, log={log_file}"
+)
+```
 
 ## Progress Indicators
 
@@ -291,3 +312,6 @@ Per [CLI Standards](cli.md), all tools must support `--debug`. Additionally:
 | Debug info to stdout | Breaks piped workflows | Use `logger.debug()` |
 | Per-module logging setup | Duplicate handlers | Configure once at entry |
 | Ignoring `--debug` flag | Users can't diagnose issues | Pass to `setup_logging()` |
+| `if debug: logger.debug(...)` | Redundant conditional | Remove `if debug:` check, logger handles level filtering |
+| Multiple log calls for one event | Hard to read, fragmented | Combine into single log statement |
+| Whitespace padding in logs (`"  Binary: {x}"`) | Logs aren't structured output | Use key=value format without padding |
