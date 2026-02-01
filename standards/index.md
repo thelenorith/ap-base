@@ -14,6 +14,7 @@ Standards for all ap-* astrophotography pipeline projects.
 | [GitHub Workflows](github-workflows.md) | CI/CD pipeline configuration |
 | [Testing](testing.md) | Unit testing conventions |
 | [CLI](cli.md) | Command-line interface conventions |
+| [Logging & Progress](logging-progress.md) | Logging, progress indicators, and output |
 
 ## Guiding Principles
 

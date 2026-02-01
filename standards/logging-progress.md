@@ -1,0 +1,293 @@
+# Logging, Progress, and Output Standards
+
+Guidelines for output methods in ap-* CLI tools. Based on industry best practices including the 12-Factor App methodology and Python logging conventions.
+
+## Overview
+
+| Output Method | Purpose | Stream | When to Use |
+|---------------|---------|--------|-------------|
+| Logging | Operational/diagnostic | stderr | Debug info, warnings, errors |
+| Progress | User feedback | stderr | Long-running operations |
+| Print | Program output | stdout | Results, summaries, piped data |
+
+## Logging
+
+### When to Use Logging
+
+Use Python logging for **operational and diagnostic information**:
+
+| Log Level | Use For |
+|-----------|---------|
+| `DEBUG` | Detailed diagnostic info, variable values, execution flow |
+| `INFO` | Normal operational messages, milestones |
+| `WARNING` | Unexpected situations that don't prevent operation |
+| `ERROR` | Failures that prevent completing a specific operation |
+| `CRITICAL` | Severe errors that prevent program continuation |
+
+### Configuration
+
+Use `ap_common.logging_config` for consistent setup:
+
+```python
+from ap_common import setup_logging
+
+def main():
+    logger = setup_logging(name="ap_my_tool", debug=args.debug)
+```
+
+| Rule | Rationale |
+|------|-----------|
+| Configure once at entry point | Prevents duplicate handlers |
+| Use tool-specific logger name | Enables filtering by source |
+| Control level via `--debug` flag | User controls verbosity |
+
+### Logger Naming
+
+Use hierarchical names for filtering:
+
+```python
+# Main module
+logger = setup_logging(name="ap_my_tool", debug=debug)
+
+# Submodules
+logger = logging.getLogger("ap_my_tool.submodule")
+```
+
+### What to Log
+
+```python
+# DEBUG: Detailed diagnostic information
+logger.debug(f"Processing file: {filename}")
+logger.debug(f"Header values: {headers}")
+
+# INFO: Operational milestones
+logger.info("Starting calibration process")
+logger.info(f"Found {count} files to process")
+
+# WARNING: Recoverable issues
+logger.warning(f"Missing optional header key: {key}")
+logger.warning(f"File exists, skipping: {dest}")
+
+# ERROR: Operation failures
+logger.error(f"Failed to read file: {filename}")
+logger.error(f"Invalid header format in {path}")
+```
+
+### What NOT to Log
+
+| Avoid | Use Instead |
+|-------|-------------|
+| User-facing summaries | Print to stdout |
+| Progress updates | Progress indicators |
+| Primary program output | Print to stdout |
+
+## Progress Indicators
+
+### When to Use Progress
+
+Use progress indicators for **long-running operations** that process multiple items:
+
+| Scenario | Progress Type |
+|----------|--------------|
+| Processing known file list | `progress_iter()` |
+| Dynamic status updates needed | `ProgressTracker` |
+| Unknown total count | `ProgressTracker` (manual mode) |
+| < 3 items or instant operations | None needed |
+
+### Using ap_common Progress Utilities
+
+**Simple iteration:**
+
+```python
+from ap_common import progress_iter
+
+for f in progress_iter(files, desc="Processing", enabled=not quiet):
+    process_file(f)
+```
+
+**With status updates:**
+
+```python
+from ap_common import ProgressTracker
+
+with ProgressTracker(files, desc="Processing", enabled=show_progress) as tracker:
+    for f in tracker:
+        tracker.set_status(os.path.basename(f))
+        process_file(f)
+```
+
+**Unknown total:**
+
+```python
+tracker = ProgressTracker(desc="Scanning", enabled=show_progress)
+tracker.start()
+for item in generator():
+    tracker.update(status=item.name)
+tracker.finish()
+```
+
+### Progress Configuration
+
+| Parameter | Purpose |
+|-----------|---------|
+| `desc` | Action being performed (e.g., "Moving files") |
+| `unit` | What's being counted (e.g., "files", "dirs") |
+| `enabled` | Control via CLI flag (default: True) |
+
+### Controlling Progress Display
+
+Progress should be controllable via CLI:
+
+| Flag | Effect |
+|------|--------|
+| `--quiet` / `-q` | Suppress progress |
+| Default (no flag) | Show progress |
+
+```python
+parser.add_argument("--quiet", "-q", action="store_true",
+                    help="suppress progress output")
+```
+
+### What NOT to Use for Progress
+
+| Avoid | Why |
+|-------|-----|
+| Manual dot printing (`print(".", end="")`) | Inconsistent, no metrics |
+| Logging progress updates | Wrong abstraction level |
+| Custom progress implementations | Duplicates ap_common functionality |
+
+## Print Statements (stdout)
+
+### When to Use Print
+
+Use print for **primary program output** that may be piped or captured:
+
+| Use Case | Example |
+|----------|---------|
+| Final results/summaries | "Moved 42 files to /data" |
+| Data output | File lists, JSON output |
+| User decisions | "REJECTED: file.fits (low quality)" |
+| Dry-run output | "Would move: src → dest" |
+
+### Print Guidelines
+
+```python
+# Final summary (always shown)
+print(f"Processed {count} files successfully")
+
+# Dry-run output
+if dryrun:
+    print(f"Would move: {src} → {dest}")
+
+# Rejection/decision output
+print(f"REJECTED: {filename} (reason: {reason})")
+```
+
+### What NOT to Print
+
+| Avoid | Use Instead |
+|-------|-------------|
+| Debug information | `logger.debug()` |
+| Operational status | `logger.info()` |
+| Warnings | `logger.warning()` |
+| Progress dots | `progress_iter()` |
+
+## Decision Matrix
+
+Use this matrix to choose the right output method:
+
+| Question | Yes → Use |
+|----------|-----------|
+| Is this diagnostic/debugging information? | Logging |
+| Is this a warning or error condition? | Logging |
+| Is this showing progress through a list? | Progress indicator |
+| Is this the primary output/result? | Print |
+| Should this appear in piped output? | Print |
+| Is this dry-run information? | Print |
+
+## Common Patterns
+
+### Standard CLI Tool Structure
+
+```python
+from ap_common import setup_logging, progress_iter
+
+def main():
+    args = parse_args()
+    logger = setup_logging(name="ap_my_tool", debug=args.debug)
+
+    logger.info("Starting processing")
+
+    results = []
+    for f in progress_iter(files, desc="Processing", enabled=not args.quiet):
+        logger.debug(f"Processing: {f}")
+        result = process(f)
+        if result:
+            results.append(result)
+
+    logger.info(f"Completed with {len(results)} results")
+
+    # Primary output
+    print(f"Processed {len(results)} files")
+    if args.verbose:
+        for r in results:
+            print(f"  {r}")
+```
+
+### Dry-Run Pattern
+
+```python
+for src, dest in progress_iter(moves, desc="Moving files", enabled=not quiet):
+    if dryrun:
+        print(f"Would move: {src} → {dest}")
+    else:
+        shutil.move(src, dest)
+        logger.debug(f"Moved: {src} → {dest}")
+
+if not dryrun:
+    print(f"Moved {len(moves)} files")
+```
+
+### Error Handling Pattern
+
+```python
+try:
+    result = process_file(path)
+except FileNotFoundError:
+    logger.error(f"File not found: {path}")
+    return None
+except PermissionError:
+    logger.error(f"Permission denied: {path}")
+    return None
+except Exception as e:
+    logger.exception(f"Unexpected error processing {path}")
+    raise
+```
+
+## Summary Table
+
+| Output Type | Stream | Controlled By | ap_common Utility |
+|-------------|--------|---------------|-------------------|
+| Logging | stderr | `--debug` | `setup_logging()`, `get_logger()` |
+| Progress | stderr | `--quiet` | `progress_iter()`, `ProgressTracker` |
+| Print | stdout | `--verbose` (optional) | None (built-in) |
+
+## Required CLI Flags
+
+Per [CLI Standards](cli.md), all tools must support `--debug`. Additionally:
+
+| Flag | Purpose |
+|------|---------|
+| `--debug` | Enable DEBUG-level logging |
+| `--quiet` / `-q` | Suppress progress indicators (recommended) |
+
+## Anti-Patterns
+
+| Anti-Pattern | Problem | Correct Approach |
+|--------------|---------|------------------|
+| `print("Processing...")` for status | Clutters stdout | Use logging or progress |
+| `print(".", end="")` for progress | No metrics, inconsistent | Use `progress_iter()` |
+| Logging final results | Results don't appear in piped output | Use print |
+| Debug info to stdout | Breaks piped workflows | Use `logger.debug()` |
+| Per-module logging setup | Duplicate handlers | Configure once at entry |
+| Ignoring `--debug` flag | Users can't diagnose issues | Pass to `setup_logging()` |

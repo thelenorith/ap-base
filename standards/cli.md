@@ -13,10 +13,11 @@ Command-line interface conventions for ap-* tools.
 
 All CLI tools must support:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `--debug` | flag | Enable debug output |
-| `--dryrun` | flag | Perform dry run without side effects |
+| Option | Short | Type | Description |
+|--------|-------|------|-------------|
+| `--debug` | | flag | Enable debug output |
+| `--dryrun` | | flag | Perform dry run without side effects |
+| `--quiet` | `-q` | flag | Suppress progress output |
 
 ## Option Naming
 
