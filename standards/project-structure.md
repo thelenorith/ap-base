@@ -17,6 +17,7 @@ ap-<name>/
 │   └── workflows/
 │       ├── test.yml
 │       ├── lint.yml
+│       ├── typecheck.yml
 │       ├── format.yml
 │       └── coverage.yml
 ├── .gitignore
