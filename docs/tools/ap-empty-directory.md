@@ -35,6 +35,9 @@ python -m ap_empty_directory /path/to/blink --recursive
 
 # Preview what would be deleted
 python -m ap_empty_directory /path/to/blink --recursive --dryrun
+
+# Exclude .keep files from deletion (preserves empty directories)
+python -m ap_empty_directory /path/to/blink --recursive --exclude-regex '\.keep'
 ```
 
 ## Options
@@ -42,6 +45,7 @@ python -m ap_empty_directory /path/to/blink --recursive --dryrun
 | Option | Short | Description |
 |--------|-------|-------------|
 | `--recursive` | `-r` | Recursively delete files in subdirectories |
+| `--exclude-regex` | `-e` | Exclude files matching the pattern from deletion |
 | `--dryrun` | `-n` | Show what would be deleted without deleting |
 | `--debug` | `-d` | Enable debug output |
 
