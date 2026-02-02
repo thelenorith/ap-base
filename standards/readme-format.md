@@ -56,7 +56,7 @@ This tool is part of the astrophotography pipeline. For comprehensive documentat
 
 - **[Pipeline Overview](https://github.com/jewzaam/ap-base/blob/main/docs/index.md)** - Full pipeline documentation
 - **[Workflow Guide](https://github.com/jewzaam/ap-base/blob/main/docs/workflow.md)** - Detailed workflow with diagrams
-- **[ap-<name> Reference](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-<name>.md)** - API reference for this tool
+- **[ap-<name> Guide](https://github.com/jewzaam/ap-base/blob/main/docs/tools/ap-<name>.md)** - Detailed usage guide for this tool
 ```
 
 Replace `<name>` with the actual project name (e.g., `ap-common`, `ap-cull-lights`).
