@@ -32,14 +32,23 @@ Use `ap_common.logging_config` for consistent setup:
 from ap_common import setup_logging
 
 def main():
-    logger = setup_logging(name="ap_my_tool", debug=args.debug)
+    logger = setup_logging(name="ap_my_tool", debug=args.debug, quiet=args.quiet)
 ```
 
 | Rule | Rationale |
 |------|-----------|
 | Configure once at entry point | Prevents duplicate handlers |
 | Use tool-specific logger name | Enables filtering by source |
-| Control level via `--debug` flag | User controls verbosity |
+| Control level via `--debug` and `--quiet` flags | User controls verbosity |
+
+### Logging Level Behavior
+
+| Flags | Effective Level | Output |
+|-------|-----------------|--------|
+| Default | INFO | INFO, WARNING, ERROR |
+| `--quiet` | WARNING | WARNING, ERROR only |
+| `--debug` | DEBUG | DEBUG, INFO, WARNING, ERROR |
+| `--debug --quiet` | DEBUG | DEBUG, INFO, WARNING, ERROR (debug overrides quiet) |
 
 ### Logger Naming
 
@@ -159,14 +168,16 @@ tracker.finish()
 
 Progress should be controllable via CLI:
 
-| Flag | Effect |
-|------|--------|
-| `--quiet` / `-q` | Suppress progress |
-| Default (no flag) | Show progress |
+| Flag | Effect on Progress |
+|------|-------------------|
+| `--quiet` / `-q` | Suppress progress indicators |
+| Default (no flag) | Show progress indicators |
+
+Note: The `--quiet` flag also suppresses INFO-level logging and summary statistics. See [CLI Standards](cli.md#--quiet-flag-behavior) for full specification.
 
 ```python
 parser.add_argument("--quiet", "-q", action="store_true",
-                    help="suppress progress output")
+                    help="suppress non-essential output")
 ```
 
 ### What NOT to Use for Progress
@@ -235,9 +246,9 @@ from ap_common import setup_logging, progress_iter
 
 def main():
     args = parse_args()
-    logger = setup_logging(name="ap_my_tool", debug=args.debug)
+    logger = setup_logging(name="ap_my_tool", debug=args.debug, quiet=args.quiet)
 
-    logger.info("Starting processing")
+    logger.info("Starting processing")  # Suppressed by --quiet
 
     results = []
     for f in progress_iter(files, desc="Processing", enabled=not args.quiet):
@@ -246,10 +257,11 @@ def main():
         if result:
             results.append(result)
 
-    logger.info(f"Completed with {len(results)} results")
+    logger.info(f"Completed with {len(results)} results")  # Suppressed by --quiet
 
-    # Primary output
-    print(f"Processed {len(results)} files")
+    # Summary output (suppressed by --quiet)
+    if not args.quiet:
+        print(f"Processed {len(results)} files")
     if args.verbose:
         for r in results:
             print(f"  {r}")
@@ -289,18 +301,23 @@ except Exception as e:
 
 | Output Type | Stream | Controlled By | ap_common Utility |
 |-------------|--------|---------------|-------------------|
-| Logging | stderr | `--debug` | `setup_logging()`, `get_logger()` |
-| Progress | stderr | `--quiet` | `progress_iter()`, `ProgressTracker` |
-| Print | stdout | `--verbose` (optional) | None (built-in) |
+| Logging (DEBUG) | stderr | `--debug` | `setup_logging()`, `get_logger()` |
+| Logging (INFO) | stderr | `--quiet` (suppresses) | `setup_logging()`, `get_logger()` |
+| Logging (WARNING+) | stderr | Always shown | `setup_logging()`, `get_logger()` |
+| Progress | stderr | `--quiet` (suppresses) | `progress_iter()`, `ProgressTracker` |
+| Summary output | stdout | `--quiet` (suppresses) | None (built-in) |
+| Dry-run output | stdout | Always shown | None (built-in) |
 
 ## Required CLI Flags
 
-Per [CLI Standards](cli.md), all tools must support `--debug`. Additionally:
+Per [CLI Standards](cli.md), all tools must support these flags:
 
 | Flag | Purpose |
 |------|---------|
 | `--debug` | Enable DEBUG-level logging |
-| `--quiet` / `-q` | Suppress progress indicators (recommended) |
+| `--quiet` / `-q` | Suppress non-essential output (progress, INFO logs, summaries) |
+
+See [CLI Standards - --quiet Flag Behavior](cli.md#--quiet-flag-behavior) for full specification.
 
 ## Anti-Patterns
 

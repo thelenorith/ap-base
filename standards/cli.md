@@ -17,7 +17,37 @@ All CLI tools must support:
 |--------|-------|------|-------------|
 | `--debug` | | flag | Enable debug output |
 | `--dryrun` | | flag | Perform dry run without side effects |
-| `--quiet` | `-q` | flag | Suppress progress output |
+| `--quiet` | `-q` | flag | Suppress non-essential output (see below) |
+
+### `--quiet` Flag Behavior
+
+The `--quiet` flag enables minimal output mode for scripting, automation, and clean logging.
+
+**Suppressed when `--quiet` is set:**
+
+| Output Type | Examples |
+|-------------|----------|
+| Progress indicators | Progress bars, spinners, percentage counters |
+| INFO-level logging | "Starting processing", "Found N files" |
+| Summary statistics | "Processed 42 files successfully" |
+
+**Never suppressed (always shown):**
+
+| Output Type | Rationale |
+|-------------|-----------|
+| WARNING messages | Indicate potential issues requiring attention |
+| ERROR messages | Critical for diagnosing failures |
+| Exit codes | Required for scripting and automation |
+| Dry-run output | User explicitly requested this information |
+
+**Use cases:**
+
+- Scripting/automation requiring minimal output
+- Cron jobs avoiding unnecessary email notifications
+- File logging where progress bars create unwanted artifacts
+- CI/CD pipelines with cleaner logs
+
+See [Logging and Progress Standards](logging-progress.md) for implementation patterns.
 
 ## Option Naming
 
