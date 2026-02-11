@@ -6,6 +6,7 @@ Standards for all ap-* astrophotography pipeline projects.
 
 | Standard | Description |
 |----------|-------------|
+| [Python Style](python-style.md) | Python coding style and best practices |
 | [ap-common Usage](ap-common-usage.md) | Use shared constants from ap-common |
 | [Naming](naming.md) | Project and package naming conventions |
 | [Project Structure](project-structure.md) | Directory layout and required files |

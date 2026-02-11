@@ -218,6 +218,60 @@ def find_matching_flat(
 
 ---
 
+### Test Empty/None Filter Workflow
+
+**Current State:**
+Empty/None filter values are normalized to empty string for consistency across projects, but the complete workflow hasn't been tested end-to-end.
+
+**Problem:**
+- No integration tests for lights with no filter installed (filter="")
+- No tests covering the complete workflow from raw lights → blink → data → calibration
+- No validation that empty filter values match correctly across all projects
+
+**Proposed Solution:**
+Create comprehensive integration tests that verify the complete workflow with empty filter values:
+
+1. **Test Scenario: Filterless Imaging Session**
+   - Raw lights with no filter (filter="")
+   - Darks, flats, bias with no filter (filter="")
+   - Process through complete workflow:
+     - ap-move-raw-light-to-blink
+     - ap-create-master (create master calibration frames)
+     - ap-copy-master-to-blink
+     - ap-move-light-to-data
+
+2. **Verification Points:**
+   - Grouping: Filterless lights group together (not split)
+   - Matching: Filterless lights match filterless masters (strict)
+   - Metrics: Empty filter counted correctly in summaries
+   - File organization: Proper directory structure for filterless frames
+
+3. **Test Data:**
+   - Create small test FITS files with filter="" or filter not set
+   - Include metadata for camera, gain, offset, settemp, etc.
+   - Cover all frame types: LIGHT, DARK, FLAT, BIAS
+
+4. **Coverage:**
+   - ap-copy-master-to-blink: Grouping and matching with filter=""
+   - ap-move-light-to-data: Matching with filter=""
+   - ap-create-master: Grouping with filter=""
+   - ap-move-master-to-library: Filename generation with filter=""
+
+**Implementation Steps:**
+1. Create test FITS files with empty filter metadata
+2. Add integration test to ap-copy-master-to-blink
+3. Add integration test to ap-move-light-to-data
+4. Add integration test to ap-create-master
+5. Add unit tests for empty filter in all matching functions
+6. Document expected behavior in standards/
+
+**Benefits:**
+- Confidence that filterless imaging workflows work correctly
+- Prevents regressions in None/empty filter handling
+- Documents expected behavior for users
+
+---
+
 ## Notes
 
 - Keep TODO items updated as they are implemented
