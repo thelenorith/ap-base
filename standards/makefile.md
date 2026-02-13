@@ -18,6 +18,7 @@ make default   # Same as above (explicit)
 | `default` | Run format, lint, typecheck, test, coverage |
 | `install` | Install package |
 | `install-dev` | Install in editable mode with dev deps |
+| `install-no-deps` | Install in editable mode without dependencies |
 | `uninstall` | Uninstall package |
 | `clean` | Remove build artifacts |
 | `format` | Format code with black |
@@ -25,6 +26,25 @@ make default   # Same as above (explicit)
 | `typecheck` | Type check with mypy |
 | `test` | Run pytest |
 | `coverage` | Run pytest with coverage |
+
+## Monorepo Development
+
+When working in ap-base with local changes to dependencies (e.g., modifying ap-common while working on ap-copy-master-to-blink):
+
+```bash
+# Install ap-common with dependencies
+cd ap-common
+make install-dev
+
+# Install dependent tool WITHOUT dependencies (preserves local ap-common)
+cd ../ap-copy-master-to-blink
+make install-no-deps
+
+# Run tests (uses local ap-common)
+make test
+```
+
+The `install-no-deps` target uses `pip install -e . --no-deps` to skip dependency installation, preventing pip from fetching ap-common from PyPI and overwriting your local editable install.
 
 ## Template
 

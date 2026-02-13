@@ -1,7 +1,7 @@
 # Makefile template for ap-* projects
 # Replace <name> with the project name (e.g., ap-cull-light -> cull_light)
 
-.PHONY: install install-dev uninstall clean format lint typecheck test test-verbose coverage default
+.PHONY: install install-dev install-no-deps uninstall clean format lint typecheck test test-verbose coverage default
 
 PYTHON := python
 
@@ -12,6 +12,9 @@ install:
 
 install-dev:
 	$(PYTHON) -m pip install -e ".[dev]"
+
+install-no-deps:
+	$(PYTHON) -m pip install -e . --no-deps
 
 uninstall:
 	$(PYTHON) -m pip uninstall -y ap-<name>
