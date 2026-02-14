@@ -1,5 +1,8 @@
 # ap-base
 
+[![Markdown Lint](https://github.com/jewzaam/ap-base/actions/workflows/markdown-lint.yml/badge.svg)](https://github.com/jewzaam/ap-base/actions/workflows/markdown-lint.yml)
+[![Validate Links](https://github.com/jewzaam/ap-base/actions/workflows/links.yml/badge.svg)](https://github.com/jewzaam/ap-base/actions/workflows/links.yml)
+
 Monorepo aggregating all astrophotography pipeline projects as git submodules.
 
 ## Purpose
