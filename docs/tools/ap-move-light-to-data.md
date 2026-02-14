@@ -32,7 +32,7 @@ python -m ap_move_light_to_data <source_dir> <dest_dir> [options]
 | `-d`, `--debug` | Enable debug output |
 | `-n`, `--dryrun` | Show what would be done without moving files |
 | `-q`, `--quiet` | Suppress progress output |
-| `--allow-bias` | Allow shorter darks with bias frames (default: only exact exposure match darks) |
+| `--scale-dark` | Scale dark frames using bias compensation (allows shorter exposures). Default: exact exposure match only |
 | `--path-pattern REGEX` | Filter light directories by regex pattern (e.g., `"M31"`, `"FILTER_Ha"`) |
 
 ### Examples
@@ -89,10 +89,10 @@ Lights are only moved when calibration frames are found (in the lights directory
 
 ### Bias Requirement
 
-Bias frames are **only required** when the dark exposure time does not match the light exposure time and `--allow-bias` is specified. This is because darks with mismatched exposure times need bias subtraction for proper scaling.
+Bias frames are **only required** when the dark exposure time does not match the light exposure time and `--scale-dark` is specified. This is because darks with mismatched exposure times need bias subtraction for proper scaling.
 
-- **Default behavior**: Without `--allow-bias`, only exact exposure match darks are used
-- **With `--allow-bias`**:
+- **Default behavior**: Without `--scale-dark`, only exact exposure match darks are used
+- **With `--scale-dark`**:
   - If dark exposure matches light exposure: **No bias required**
   - If dark exposure differs from light exposure: **Bias required**
 
