@@ -120,6 +120,7 @@ git push
 Centralized documentation lives in `docs/`:
 
 - [Documentation Index](docs/index.md) - Overview of available documentation
+- [Quick Start](docs/quick-start.md) - Set up batch scripts for the processing workflow
 - [Directory Structure](docs/directory-structure.md) - Pipeline directory layout
 - [Workflow](docs/workflow.md) - Processing workflow documentation
 - [Tools](docs/tools/) - Tool-specific documentation

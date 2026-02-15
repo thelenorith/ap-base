@@ -110,6 +110,7 @@ python -m ap_move_light_to_data /data/equipment/10_Blink /data/equipment/20_Data
 
 ## Documentation
 
+- [Quick Start](quick-start.md) - Set up batch scripts for the processing workflow
 - [Workflow Guide](workflow.md) - Detailed workflow documentation
 - [Directory Structure](directory-structure.md) - How files are organized
 - [Tool Reference](tools/) - Individual tool documentation
