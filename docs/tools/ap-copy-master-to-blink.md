@@ -30,6 +30,8 @@ python -m ap_copy_master_to_blink <library_dir> <blink_dir> [options]
 | `--debug` | Enable debug logging |
 | `--quiet`, `-q` | Suppress progress output |
 | `--scale-dark` | Scale dark frames using bias compensation (allows shorter exposures). Default: exact exposure match only |
+| `--flat-state PATH` | Path to flat state YAML file. Enables flexible flat date matching with interactive selection when no exact date match exists. Without this option, only exact date matches are used |
+| `--picker-limit N` | Max older/newer flat dates to show in interactive picker (default: 5). Only used with `--flat-state` |
 
 ### Examples
 
@@ -88,7 +90,8 @@ Priority matching (in order):
 ### Flat Frames
 
 - Match by: camera, optic, filter, gain, offset, settemp, readoutmode, focallen
-- **DATE must match exactly**: Current implementation requires exact date match
+- **Default**: Exact DATE match required
+- **With `--flat-state`**: Enables flexible date matching with interactive selection when no exact date match exists
 
 ### Bias Frames
 
@@ -136,15 +139,21 @@ blink/
 
 **Rationale**: All calibration frames in one place (DATE directory) makes them easier to find and manage. Darks are shared across filter subdirectories since they're exposure-dependent, not filter-dependent.
 
-## Current Limitations
+## Flat Date Matching
 
-### Exact DATE Matching for Flats
+By default, flats require an exact DATE match with lights. For flexible date matching, use the `--flat-state` flag:
 
-Current implementation requires flats to have exact DATE match with lights. Future enhancements planned:
+```bash
+# Use flexible flat date matching with interactive picker
+python -m ap_copy_master_to_blink /calibration/library /data/10_Blink \
+    --flat-state /path/to/flat-state.yaml
 
-- **Older flats**: Scan DATE subdirectories < light frame date and pick the most recent
-- **Newer flats**: Scan DATE subdirectories > light frame date and pick the oldest
-- **Date tolerance**: Configuration option for flat date tolerance (e.g., ±7 days)
+# Limit picker to 3 older/newer dates instead of default 5
+python -m ap_copy_master_to_blink /calibration/library /data/10_Blink \
+    --flat-state /path/to/flat-state.yaml --picker-limit 3
+```
+
+When `--flat-state` is specified and no exact date match exists, an interactive picker shows nearby flat dates (older and newer) for manual selection.
 
 ## Repository
 
