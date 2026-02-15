@@ -29,10 +29,10 @@ from ap_common.fits import get_fits_headers, get_xisf_headers, get_file_headers
 headers = get_fits_headers("image.fits", profileFromPath=True)
 
 # Read XISF headers
-headers = get_xisf_headers("image.xisf")
+headers = get_xisf_headers("image.xisf", profileFromPath=True)
 
 # Parse key-value pairs from filename/path
-headers = get_file_headers("/CAMERA_ASI294/image.fits")
+headers = get_file_headers("/CAMERA_ASI294/image.fits", profileFromPath=True)
 ```
 
 ### normalization.py - Header Normalization
@@ -45,20 +45,19 @@ normalized = normalize_headers(headers)
 
 # Normalize specific values
 date = normalize_date("2026-01-29T12:30:00")  # "2026-01-29"
-filter_name = normalize_filterName("Luminance")  # "L"
+filter_name = normalize_filterName("Luminance")  # "Luminance" (returns input unchanged)
 ```
 
 #### build_normalized_filters() - Build Normalized Filter Criteria
 
 ```python
-from ap_common.normalization import build_normalized_filters
+from ap_common.metadata import build_normalized_filters
 
 # Build normalized filter criteria for matching
-filters = build_normalized_filters({
-    "camera": "ASI294MC",
-    "filter": "Ha",
-    "gain": "100"
-})
+filters = build_normalized_filters(
+    metadata={"camera": "ASI294MC", "filter": "Ha", "gain": "100"},
+    headers=["camera", "filter", "gain"],
+)
 # Returns normalized filters with None values converted to empty strings
 ```
 
@@ -97,14 +96,14 @@ metadata = get_filtered_metadata(
 ```python
 from ap_common.utils import replace_env_vars, camelCase, get_filenames
 
-# Replace environment variables in paths
-path = replace_env_vars("$AP_DATA_ROOT/images")
+# Replace percent-style environment variables in paths
+path = replace_env_vars("%AP_DATA_ROOT%/images")
 
 # Convert to camelCase
 name = camelCase("FILTER_NAME")  # "filterName"
 
-# Find files matching patterns
-files = get_filenames("/data", patterns=["*.fits", "*.xisf"])
+# Find files matching regex patterns
+files = get_filenames(["/data"], patterns=[r".*\.fits$", r".*\.xisf$"])
 ```
 
 ## Normalization Data
