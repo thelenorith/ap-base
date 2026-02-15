@@ -25,6 +25,9 @@ classifiers = [
 ]
 dependencies = []
 
+[tool.setuptools]
+packages = []
+
 [project.optional-dependencies]
 dev = [
     "linkchecker>=10.0",
