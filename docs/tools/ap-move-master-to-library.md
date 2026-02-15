@@ -77,7 +77,7 @@ Identifies master frame type from `IMAGETYP` header:
 |------------|----------------|---------------|
 | MASTER BIAS | Camera | Gain, Offset, Temp, Readout |
 | MASTER DARK | Camera | Exposure, Gain, Offset, Temp, Readout |
-| MASTER FLAT | Camera, Optic, Date | Filter, Gain, Offset, Temp, Focal Length |
+| MASTER FLAT | Camera, Optic, Date | Filter, Gain, Offset, Temp, Focal Length, Readout |
 
 ## Examples
 

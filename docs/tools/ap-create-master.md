@@ -73,9 +73,9 @@ flowchart TB
     end
 
     subgraph Grouping
-        BIAS --> GROUP_B(Group by Camera/Temp/Gain/Offset)
-        DARK --> GROUP_D(Group by Camera/Temp/Gain/Offset/Exposure)
-        FLAT --> GROUP_F(Group by Camera/Temp/Gain/Offset/Date/Filter)
+        BIAS --> GROUP_B(Group by Camera/Temp/Gain/Offset/Readout)
+        DARK --> GROUP_D(Group by Camera/Temp/Gain/Offset/Readout/Exposure)
+        FLAT --> GROUP_F(Group by Camera/Temp/Gain/Offset/Readout/Date/Filter)
     end
 
     subgraph Integration
@@ -191,7 +191,7 @@ python -m ap_create_master /calibration /output --quiet \
 
 **No frames found:**
 - Check `IMAGETYP` is set correctly (bias, dark, flat)
-- Verify file extensions (.fit, .fits, .xisf)
+- Verify file extensions (.fit, .fits)
 
 **No matching master for flat:**
 - Masters must match: INSTRUME, SETTEMP, GAIN, OFFSET, READOUTM

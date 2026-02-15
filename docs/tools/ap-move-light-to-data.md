@@ -33,7 +33,7 @@ python -m ap_move_light_to_data <source_dir> <dest_dir> [options]
 | `-n`, `--dryrun` | Show what would be done without moving files |
 | `-q`, `--quiet` | Suppress progress output |
 | `--scale-dark` | Scale dark frames using bias compensation (allows shorter exposures). Default: exact exposure match only |
-| `--path-pattern REGEX` | Filter light directories by regex pattern (e.g., `"M31"`, `"FILTER_Ha"`) |
+| `--path-pattern REGEX` | Filter light directories by regex pattern (default: `".*[/\\]accept[/\\].*"` — only processes paths containing an `accept` directory). Examples: `"M31"`, `"FILTER_Ha"` |
 
 ### Examples
 
